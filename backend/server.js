@@ -1,6 +1,12 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('./config/db');
+const authRoutes = require("./routes/authRoutes");
+
+
+
+
+
 const cors = require('cors');
 
 const app = express();
@@ -8,9 +14,8 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use("/api/auth", authRoutes);
 
-app.get('/', (req, res) => res.send('Hello World!'));
-app.get('/home', (req, res) => res.send('welcome to the home page'));
 
 // Start Server
 const PORT = process.env.PORT || 5000;
