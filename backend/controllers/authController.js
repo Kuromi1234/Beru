@@ -17,20 +17,31 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "User already exists bro!" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const role = email === "arjunnathhh@gmail.com" ? "admin" : "IT";
 
     const newUser = new User({
       name,
       email,
       password: hashedPassword,
       department,
-      isAdmin: false,
+      role,
     });
 
     await newUser.save();
-    res.status(200).json({ message: "User registered successfully , Now Enjoy and login !" });
+    const userobj = newUser.toObject();
+    delete userobj.password;
+    res
+      .status(200)
+      .json({
+        message: "User registered successfully , Now Enjoy and login !",
+        user: userobj,
+      });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res
+      .status(500)
+      .json({ message: "server side error", error: err.message });
   }
+  console.log("bale bale , register hogaya")
 };
 
 // Login
@@ -40,18 +51,14 @@ exports.login = async (req, res) => {
     const foundUser = await User.findOne({ email });
 
     if (!foundUser)
-      return res
-        .status(400)
-        .json({ message: "Invalid username or password" });
+      return res.status(400).json({ message: "Invalid username or password" });
 
     const isMatch = await bcrypt.compare(password, foundUser.password);
     if (!isMatch)
-      return res
-        .status(400)
-        .json({ message: "Invalid username or password" });
+      return res.status(400).json({ message: "Invalid username or password" });
 
     const token = jwt.sign(
-      { id: foundUser._id, isAdmin: foundUser.isAdmin },
+      { id: foundUser._id, role: foundUser.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -61,7 +68,7 @@ exports.login = async (req, res) => {
       user: {
         name: foundUser.name,
         email: foundUser.email,
-        isAdmin: foundUser.isAdmin,
+        role: foundUser.role,
       },
     });
   } catch (err) {

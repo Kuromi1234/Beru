@@ -19,12 +19,13 @@ const userSchema = new mongoose.Schema(
       type:String,
       required: true,
     },
-    isAdmin: {
-      type: Boolean,
-      default: false,
+    role:{
+      type:String,
+      enum:['admin','IT','Employee'],
+      default:'Employee',
     },
   },
-  { timestamp: true }
+  { timestamps: true }
 ); //adds createdat and updated at automatically
 
 module.exports = mongoose.model("user", userSchema);

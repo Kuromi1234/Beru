@@ -4,5 +4,9 @@ const{register , login } = require("../controllers/authController");
 
 router.post("/register", register);
 router.post("/login", login);
+router.get('/register', (req, res) => {
+  res.send('Register endpoint is active!');
+});
+
 
 module.exports = router;

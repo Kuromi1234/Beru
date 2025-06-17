@@ -2,31 +2,45 @@ const mongoose = require("mongoose");
 
 const assetSchema = new mongoose.Schema(
   {
-    SerialNumber: {
+    name: {
+      type: String,
+      required: true,
+    },
+    serialNumber: {
       type: String,
       required: true,
       unique: true,
+    },
+    description: {
+      type: String,
     },
     model: {
       type: String,
       required: true,
     },
-    DeviceType: {
+    assetType: {
       type: String,
+      enum: ["Laptop", "Monitor", "Keyboard", "Mouse", "Phone", "Other"],
       required: true,
     },
-    category: {
+    status: {  
       type: String,
-      enum: ["assignedto", "retrieved", "instock"],
-      default: "instock",
+      enum: ["in_stock", "assigned", "to_be_retrieved", "damaged", "repair", "discarded"],
+      default: "in_stock",
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       default: null,
     },
+    assignedDate: {
+      type: Date,
+    },
+    returnDate: {
+      type: Date,
+    },
   },
-  { timestamp: true }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("Asset", assetSchema);
+module.exports = mongoose.model("Asset", assetSchema);  
