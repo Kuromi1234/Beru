@@ -29,7 +29,7 @@ exports.register = async (req, res) => {
 
     await newUser.save();
     const userobj = newUser.toObject();
-    delete userobj.password;
+    delete userobj.password , userobj.email , userobj.role ; 
     res
       .status(200)
       .json({
@@ -65,6 +65,7 @@ exports.login = async (req, res) => {
 
     res.status(200).json({
       token,
+      message:"user logged in successfully ",
       user: {
         name: foundUser.name,
         email: foundUser.email,
