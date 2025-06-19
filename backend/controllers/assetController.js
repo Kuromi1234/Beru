@@ -34,6 +34,7 @@ exports.createAsset = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+//get all assests
 
 exports.getAllAssets = async (req, res) => {
   try {
@@ -41,5 +42,15 @@ exports.getAllAssets = async (req, res) => {
     res.status(200).json(assets);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+//get assets by id 
+exports.getAssetById = async (req,res)=>{
+  try {
+    const asset = await Asset.findById(req.params.id).populate("assignedTo", "name email");
+    if (!asset) return res.status(404).json({ message: "Asset not found" });
+    res.status(200).json(asset);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching asset", error: err.message });
   }
 };
