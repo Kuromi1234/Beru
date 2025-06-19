@@ -3,14 +3,15 @@ const User = require("../models/user");
 
 exports.createAsset = async (req, res) => {
   try {
-    const { name, serialNumber, description, model, assetType, status } = req.body;
+    const { name, serialNumber, description, model, assetType, status } =
+      req.body;
 
     // Check for duplicate serial number
     const existing = await Asset.findOne({ serialNumber });
     if (existing) {
-      return res
-        .status(400)
-        .json({ message: "Asset exists, duplicate asset creation not allowed!" });
+      return res.status(400).json({
+        message: "Asset exists, duplicate asset creation not allowed!",
+      });
     }
 
     // Create new asset
@@ -44,13 +45,44 @@ exports.getAllAssets = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-//get assets by id 
-exports.getAssetById = async (req,res)=>{
+//get assets by id
+exports.getAssetById = async (req, res) => {
   try {
-    const asset = await Asset.findById(req.params.id).populate("assignedTo", "name email");
+    const asset = await Asset.findById(req.params.id).populate(
+      "assignedTo",
+      "name email"
+    );
     if (!asset) return res.status(404).json({ message: "Asset not found" });
     res.status(200).json(asset);
   } catch (err) {
-    res.status(500).json({ message: "Error fetching asset", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching asset", error: err.message });
+  }
+};
+
+//assign asset
+exports.assign = async (req, res) => {
+  try {
+    const { assetID, userID } = req.body;
+    const asset = await Asset.findOne({_id:assetID});
+    const user = await User.findOne({_id:userID});
+
+    if (!asset || !user) {
+      res.status(404).json({ message: "Asset or User doesn't exists ! " });
+    }
+    if (asset.status === "assigned") {
+      res.status(400).json({ meassage: "Asset is already assigned !" });
+    }
+    asset.assignedTo = user._id;
+    asset.status = "assigned";
+    asset.assignedDate = new Date();
+
+    await asset.save();
+    res.status(200).json({ message: `Asset assigned to ${user.name}`, asset });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error assigning asset", error: err.message });
   }
 };
