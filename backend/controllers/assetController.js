@@ -65,8 +65,8 @@ exports.getAssetById = async (req, res) => {
 exports.assign = async (req, res) => {
   try {
     const { assetID, userID } = req.body;
-    const asset = await Asset.findOne({_id:assetID});
-    const user = await User.findOne({_id:userID});
+    const asset = await Asset.findOne({ _id: assetID });
+    const user = await User.findOne({ _id: userID });
 
     if (!asset || !user) {
       res.status(404).json({ message: "Asset or User doesn't exists ! " });
@@ -84,5 +84,39 @@ exports.assign = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error assigning asset", error: err.message });
+  }
+};
+
+//asset retrieve
+exports.returnAsset = async (req, res) => {
+  try {
+    const { assetId } = req.body;
+
+    const asset = await Asset.findById(assetId);
+    if (!asset) {
+      console.log("Incoming asset ID:", assetId);
+      return res.status(404).json({ message: "Asset not found!" });
+    }
+
+    if (!asset.assignedTo) {
+      return res
+        .status(400)
+        .json({ message: "Asset is not currently assigned." });
+    }
+
+    asset.status = "retrieved";
+    asset.assignedTo = null;
+    asset.returnDate = new Date();
+
+    await asset.save();
+
+    res.status(200).json({
+      message: "Asset returned successfully and marked as 'retrieved'",
+      asset,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error processing return", error: err.message });
   }
 };
