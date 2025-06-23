@@ -90,12 +90,16 @@ exports.assign = async (req, res) => {
 //asset retrieve
 exports.returnAsset = async (req, res) => {
   try {
-    const { assetId } = req.body;
+    const { assetId, userID } = req.body;
 
     const asset = await Asset.findById(assetId);
+    const user = await User.findById({ _id: userID });
     if (!asset) {
       console.log("Incoming asset ID:", assetId);
       return res.status(404).json({ message: "Asset not found!" });
+    }
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
     }
 
     if (!asset.assignedTo) {
@@ -104,19 +108,65 @@ exports.returnAsset = async (req, res) => {
         .json({ message: "Asset is not currently assigned." });
     }
 
-    asset.status = "retrieved";
+    asset.status = "in_stock";
     asset.assignedTo = null;
     asset.returnDate = new Date();
 
     await asset.save();
 
     res.status(200).json({
-      message: "Asset returned successfully and marked as 'retrieved'",
+      message: `Asset retrieved successfully from ${user.name} and put back in Stock '`,
       asset,
     });
   } catch (err) {
     res
       .status(500)
       .json({ message: "Error processing return", error: err.message });
+  }
+};
+
+//controller logic for other status i.e., repair, damaged , to-be-retrieved that will be set by IT
+
+exports.updateAssets = async (req, res) => {
+  try {
+    const { assetID, assetStatus } = req.body;
+
+    if (!assetID || !assetStatus) {
+      return res
+        .status(400)
+        .json({ message: "Asset ID and Asset-Status is required mate!" });
+    }
+
+    const allowedStatuses = [
+      "in_stock",
+      "assigned",
+      "retrieved",
+      "to_be_retrieved",
+      "damaged",
+      "repair",
+      "discarded",
+    ];
+
+    if (!allowedStatuses.includes(assetStatus)) {
+      return res.status(400).json({ message: "The input is not valid" });
+    }
+
+    const asset = await Asset.findById(assetID); // FIXED THIS LINE
+    if (!asset) {
+      return res.status(404).json({ message: "Asset not found!" });
+    }
+
+    // Update status
+    asset.status = assetStatus;
+    await asset.save();
+
+    res.status(200).json({
+      message: `Asset status updated to '${assetStatus}' successfully.`,
+      asset,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error updating status", error: err.message });
   }
 };
