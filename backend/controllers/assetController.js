@@ -95,7 +95,7 @@ exports.returnAsset = async (req, res) => {
     const asset = await Asset.findById(assetId);
     const user = await User.findById({ _id: userID });
     if (!asset) {
-      console.log("Incoming asset ID:", assetId);
+      
       return res.status(404).json({ message: "Asset not found!" });
     }
     if (!user) {
@@ -177,12 +177,9 @@ exports.deleteasset = async (req, res) => {
     const { id } = req.params;
     const asset = await Asset.findByIdAndDelete(id);
     if (!asset) {
-      return res
-        .status(404)
-        .jason({
-          message:
-            "The assset your are trying to delete doesn't exist Mr.admin!",
-        });
+      return res.status(404).jason({
+        message: "The assset your are trying to delete doesn't exist Mr.admin!",
+      });
     }
     res
       .status(200)
@@ -191,5 +188,26 @@ exports.deleteasset = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Error deleting asset", error: err.messag });
+  }
+};
+//get all assets assigned to the user
+exports.UserAssets = async (req, res) => {
+  try {
+    const userid = req.params.id;
+    const asset = await Asset.find({ assignedTo: userid}).populate(
+      "assignedTo",
+      "name email"
+    );
+    if (!asset || asset.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No assets assigned to this user." });
+    }
+
+    res.status(200).json({ message: "Assets fetched successfully", asset });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error fetching user's assets", error: err.message });
   }
 };
