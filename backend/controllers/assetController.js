@@ -170,3 +170,26 @@ exports.updateAssets = async (req, res) => {
       .json({ message: "Error updating status", error: err.message });
   }
 };
+// asset delete only admin permission
+
+exports.deleteasset = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const asset = await Asset.findByIdAndDelete(id);
+    if (!asset) {
+      return res
+        .status(404)
+        .jason({
+          message:
+            "The assset your are trying to delete doesn't exist Mr.admin!",
+        });
+    }
+    res
+      .status(200)
+      .json({ message: "The Asset has been deleted successfully " }, asset);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "Error deleting asset", error: err.messag });
+  }
+};
