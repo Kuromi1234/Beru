@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {createAsset , getAllAssets , getAssetById , assign, returnAsset ,updateAssets, deleteasset} = require("../controllers/assetController");
+const {createAsset , getAllAssets , getAssetById , assign, returnAsset ,updateAssets, deleteasset , UserAssets} = require("../controllers/assetController");
 const { verifyToken } = require("../middleware/verifytoken");
 const { allowRoles } = require("../middleware/checkrole");
 
@@ -12,6 +12,7 @@ router.put("/assign", verifyToken, allowRoles("admin", "IT"), assign);
 router.put("/retrieve", verifyToken, allowRoles("admin", "IT"), returnAsset);
 router.put("/update", verifyToken, allowRoles("admin", "IT"), updateAssets);
 router.delete("/delete/:id", verifyToken, allowRoles("admin"), deleteasset);
+router.get("/user/:id", verifyToken, allowRoles("admin","IT"), UserAssets);
 
 
 
