@@ -177,17 +177,17 @@ exports.deleteasset = async (req, res) => {
     const { id } = req.params;
     const asset = await Asset.findByIdAndDelete(id);
     if (!asset) {
-      return res.status(404).jason({
+      return res.status(404).json({
         message: "The assset your are trying to delete doesn't exist Mr.admin!",
       });
     }
     res
       .status(200)
-      .json({ message: "The Asset has been deleted successfully " }, asset);
+      .json({ message: "The Asset has been deleted successfully " ,asset });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Error deleting asset", error: err.messag });
+      .json({ message: "Error deleting asset", error: err.message });
   }
 };
 //get all assets assigned to the user
