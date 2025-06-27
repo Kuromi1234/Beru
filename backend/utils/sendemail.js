@@ -1,6 +1,5 @@
 const nodemailer = require("nodemailer");
-console.log("Using email:", process.env.EMAIL_USER);
-console.log("Using password:", process.env.EMAIL_PASS);
+
 
 
 const transporter = nodemailer.createTransport({
