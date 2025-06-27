@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const assetRoutes = require("./routes/assetRoutes");
+const passwordRoutes = require("./routes/passwordRoutes");
 const cors = require("cors");
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api/assets", assetRoutes);
+app.use("/api/psswd",passwordRoutes);
 
 //err handler
 app.use((req, res) => {
