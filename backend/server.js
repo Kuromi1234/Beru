@@ -4,6 +4,8 @@ const mongoose = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const assetRoutes = require("./routes/assetRoutes");
 const passwordRoutes = require("./routes/passwordRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const errorHandler = require("./middleware/errorhandler");
 const cors = require("cors");
 const app = express();
 
@@ -15,11 +17,17 @@ app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/psswd",passwordRoutes);
+app.use("/api/admin",adminRoutes);
 
 //err handler
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found !" });
+app.use((req, res, next) => {
+  const error = new Error("Route not found!");
+  error.status = 404;
+  next(error);
 });
+
+// Global error handler
+app.use(errorHandler);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
