@@ -25,7 +25,7 @@ const assetSchema = new mongoose.Schema(
     },
     status: {  
       type: String,
-      enum: ["in_stock", "assigned", "to_be_retrieved", "damaged", "repair", "discarded"],
+      enum: ["in_stock", "assigned", "retrieved","to_be_retrieved", "damaged", "repair", "discarded"],
       default: "in_stock",
     },
     assignedTo: {
