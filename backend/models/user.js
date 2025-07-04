@@ -16,13 +16,19 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     password: {
-      type:String,
+      type: String,
       required: true,
     },
-    role:{
-      type:String,
-      enum:['admin','IT','Employee'],
-      default:'Employee',
+    employeeId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
+    role: {
+      type: String,
+      enum: ["admin", "IT", "Employee"],
+      default: "Employee",
     },
   },
   { timestamps: true }
