@@ -54,6 +54,24 @@
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+/* Custom font glow */
 .glow-signature {
-  text-shadow: 0 0 5px rgba(128, 90, 213, 0.8), 0 0 15px rgba(128, 90, 213, 0.5);
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px #888788, 0 0 10px #d7acff;
+  }
+  to {
+    text-shadow: 0 0 15px #dadada, 0 0 25px #e3d4f3;
+  }
+}
+
+.glow {
+  text-shadow: 0 0 10px #e0b0ff, 0 0 20px #e0b0ff, 0 0 30px #e0b0ff;
+}
+@keyframes wiggle {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(10px) rotate(1deg); }
 }
