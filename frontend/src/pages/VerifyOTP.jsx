@@ -9,16 +9,9 @@ export default function VerifyOtp() {
   const navigate = useNavigate();
 
   const handleVerify = async (e) => {
-    e.preventDefault();
-    setError("");
-
     try {
-      // 🔗 Call your backend API to verify OTP
-      // Example:
-      // await api.verifyOtp({ otp });
-      console.log("Verifying OTP:", otp);
-
-      // On success, navigate to reset-password
+      e.preventDefault();
+      localStorage.setItem("resetToken", otp); // store OTP temporarily
       navigate("/ResetPassword");
     } catch (err) {
       console.error(err);
@@ -53,8 +46,8 @@ export default function VerifyOtp() {
           transition={{ delay: 0.4 }}
           className="text-center text-slate-300 mb-6 text-sm"
         >
-          Enter the code we just sent to your email.  
-          It’s your key to unleash BERU again! 🔑
+          Enter the code we just sent to your email. It’s your key to unleash
+          BERU again! 🔑
         </motion.p>
 
         <form onSubmit={handleVerify} className="space-y-5">
