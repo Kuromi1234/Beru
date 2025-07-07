@@ -1,22 +1,37 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaKey, FaLock } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { resetPasswordWithOTP } from "../utils/api"; // your API call helper
 
 export default function ResetPassword() {
-  const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleReset = (e) => {
+  const storedEmail = localStorage.getItem("resetEmail");     // email saved earlier
+  const storedOTP = localStorage.getItem("resetToken");       // OTP saved from VerifyOtp
+  const navigate = useNavigate();
+
+  const handleReset = async (e) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match ❌");
+      alert("Passwords do not match");
       return;
     }
 
-    console.log("Resetting password with OTP:", otp);
-    // 🔐 Here, connect to backend to verify OTP + reset password
-  };
+    try {
+      await resetPasswordWithOTP(storedEmail, storedOTP, password);
+      alert("Password reset successful!");
+
+      // Cleanup and redirect
+      localStorage.removeItem("resetEmail");
+      localStorage.removeItem("resetToken");
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+      alert("OTP invalid or expired");
+    }
+  };;
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-zinc-900 via-slate-900 to-black flex items-center justify-center px-4 sm:px-6 lg:px-8">
