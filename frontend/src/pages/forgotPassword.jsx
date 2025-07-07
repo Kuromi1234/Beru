@@ -5,12 +5,18 @@ import { FaRegPaperPlane } from "react-icons/fa";
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
 
-  const handleSendOTP = (e) => {
+  const handleSendOTP = async (e) => {
     e.preventDefault();
-    console.log("Sending OTP to:", email);
-    navigate("/verifyOTP");
+    try {
+      await requestPasswordReset(email);
+      localStorage.setItem("resetEmail", email);
+      alert("OTP sent to your email");
+      navigate("/verifyOTP");
+    } catch (err) {
+      console.error(err);
+      alert("User not found or error sending OTP");
+    }
   };
-
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-black via-slate-900 to-zinc-800 flex items-center justify-center px-4 sm:px-6 lg:px-8">
