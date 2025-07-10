@@ -10,6 +10,7 @@ import ResetPassword from "./pages/ResetPassword";
 // ✅ FIXED: Default import
 import AdminLayout from "./pages/admin/AdminLayoutTemp";
 import Dashboard from "./pages/admin/Dashboard";
+import ResetUserPassword from "./pages/admin/ResetUserPassword";
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
       {/* Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="reset-user-password" element={<ResetUserPassword />} />
       </Route>
     </Routes>
   );
