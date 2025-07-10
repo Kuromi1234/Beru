@@ -6,11 +6,13 @@ const links = [
   { to: "/admin/assets", icon: <FaLaptop />, label: "All Assets" },
   { to: "/admin/users", icon: <FaUsers />, label: "All Users" },
   { to: "/admin/add-user", icon: <FaUserPlus />, label: "Add User" },
+  { to: "/admin/reset-user-password", icon: <FaUserCircle />, label: "Reset User Password" },
 ];
 
 export default function Sidebar() {
   return (
-    <aside className="w-64 hidden md:flex flex-col justify-between space-y-82 bg-white/10 backdrop-blur-xl border-r border-white/10 shadow-xl z-10">
+    <aside className="w-64 h-full min-h-screen hidden md:flex flex-col justify-between bg-white/10  border-r border-white/10 shadow-xl z-10">
+      {/* Top Logo and Navigation */}
       <div>
         <div className="text-3xl font-bold px-6 py-5 text-white tracking-wider">
           <span className="text-purple-400">BERU</span>Admin
@@ -34,7 +36,7 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* User email section */}
+      {/* Bottom Logged-in Info */}
       <div className="p-4">
         <div className="bg-black/30 text-white rounded-lg px-4 py-3 flex items-center gap-3">
           <FaUserCircle size={28} className="text-purple-300" />
