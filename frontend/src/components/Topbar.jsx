@@ -1,23 +1,25 @@
 import { motion } from "framer-motion";
 import { FaSignOutAlt, FaBars } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function Topbar({ onMenuClick }) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/"); // Go back to landing
+    // Optional: Show toast
+    toast.success("You have been logged out.");
+  };
+
   return (
     <header className="w-full px-6 py-4 flex items-center justify-between bg-white/5 border-b border-white/10 shadow-sm z-10">
-
-      {/* Left Side - Hamburger + Title */}
       <div className="flex items-center gap-4">
-        {/* Hamburger Icon (Mobile only) */}
-        <motion.button
+        <FaBars
           onClick={onMenuClick}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          className="md:hidden text-purple-400 hover:text-purple-300 transition"
-        >
-          <FaBars size={24} />
-        </motion.button>
-
-        {/* Animated Page Title */}
+          className="text-purple-300 text-xl cursor-pointer md:hidden"
+        />
         <motion.h1
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -28,8 +30,8 @@ export default function Topbar({ onMenuClick }) {
         </motion.h1>
       </div>
 
-      {/* Logout Button */}
       <motion.button
+        onClick={handleLogout}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-purple-700 transition"
