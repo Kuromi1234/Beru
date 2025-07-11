@@ -16,14 +16,21 @@ const Login = () => {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", formData);
 
+      const { token, user } = res.data;
+
       toast.success(res.data.message || "Logged in successfully!");
 
-      // Save token & user to localStorage (or context)
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      // Navigate to dashboard (or homepage)
-      navigate("/");
+      // Route based on user role
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else if (user.role === "IT") {
+        navigate("/IT/dashboard"); // prepare later
+      } else {
+        toast.error("❌ Unauthorized role!");
+      }
     } catch (err) {
       const msg = err.response?.data?.message || "Login failed";
       toast.error(`❌ ${msg}`);
