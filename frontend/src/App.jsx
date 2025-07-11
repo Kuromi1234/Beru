@@ -11,6 +11,9 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminLayout from "./pages/admin/AdminLayoutTemp";
 import Dashboard from "./pages/admin/Dashboard";
 import ResetUserPassword from "./pages/admin/ResetUserPassword";
+import AllAssets from "./pages/admin/AllAssets";
+import AllUsers from "./pages/admin/AllUsers";
+import AddUser from "./pages/admin/AddUser";
 
 const App = () => {
   return (
@@ -27,6 +30,11 @@ const App = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="reset-user-password" element={<ResetUserPassword />} />
+        <Route path="assets" element={<AllAssets />} />
+        <Route path="users" element={<AllUsers />} />
+        <Route path="add-user" element={<AddUser />} />
+
+
       </Route>
     </Routes>
   );
