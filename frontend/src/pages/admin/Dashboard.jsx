@@ -14,8 +14,6 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
-//dashboard component structure
-
 export default function Dashboard() {
   const [stats, setStats] = useState({
     users: 12,
@@ -25,9 +23,9 @@ export default function Dashboard() {
   });
 
   const recentAssignments = [
-    { empid: "IT1023", name: "Aman Raj", asset: "Dell Laptop", date: "2025-07-07" },
-    { empid: "IT1024", name: "Sneha Kumari", asset: "HP Monitor", date: "2025-07-06" },
-    { empid: "IT1025", name: "Ritik Sinha", asset: "MacBook Air", date: "2025-07-05" },
+    { empid: "0101023", name: "Adrian", asset: "Dell latitude 5420", date: "2025-07-07" },
+    { empid: "0101024", name: "Srimanth", asset: "HP Monitor", date: "2025-07-06" },
+    { empid: "0101025", name: "Ashok", asset: "Lenovo Thinkpad", date: "2025-07-05" },
   ];
 
   const assetPieData = {
@@ -53,7 +51,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 scroll-smooth">
       <DashboardHeader />
       <StatCards stats={stats} />
       <Charts assetPieData={assetPieData} activityBarData={activityBarData} />
@@ -61,27 +59,21 @@ export default function Dashboard() {
     </div>
   );
 }
-//dashboard header component
 
 const DashboardHeader = () => (
   <motion.div
     className="relative text-center"
     initial={{ opacity: 0, y: -40 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.8 }}
+    transition={{ duration: 0.6 }}
   >
     <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-      Welcome to the{" "}
-      <span className="text-purple-400 drop-shadow-md">BERU Admin Dashboard</span>
+      Welcome to the <span className="text-purple-400 drop-shadow-md">BERU Admin Dashboard</span>
     </h1>
     <p className="mt-2 text-slate-400">Manage your users and IT assets effortlessly 🚀</p>
-
-    {/* Animated blob */}
-    <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse -z-10" />
+    <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-72 h-72 bg-purple-500/10 rounded-full blur-md animate-pulse -z-10" />
   </motion.div>
 );
-
-//stat cards component
 
 const StatCards = ({ stats }) => {
   const cards = [
@@ -96,7 +88,7 @@ const StatCards = ({ stats }) => {
       {cards.map((card, idx) => (
         <motion.div
           key={idx}
-          className="bg-white/10 backdrop-blur-xl rounded-xl p-6 shadow-md border border-white/10 flex flex-col items-center text-center"
+          className="bg-white/5 rounded-xl p-6 shadow-lg border border-white/10 flex flex-col items-center text-center hover:scale-[1.02] transition-transform duration-200"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 * idx }}
@@ -110,25 +102,24 @@ const StatCards = ({ stats }) => {
   );
 };
 
-//charts component
 const Charts = ({ assetPieData, activityBarData }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <motion.div
-        className="bg-white/10 p-6 rounded-xl shadow-md border border-white/10"
-        initial={{ opacity: 0, x: -40 }}
+        className="bg-white/5 p-6 rounded-xl shadow-md border border-white/10"
+        initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.5 }}
       >
         <h3 className="text-white text-xl font-semibold mb-4">Asset Distribution</h3>
         <Doughnut data={assetPieData} />
       </motion.div>
 
       <motion.div
-        className="bg-white/10 p-6 rounded-xl shadow-md border border-white/10"
-        initial={{ opacity: 0, x: 40 }}
+        className="bg-white/5 p-6 rounded-xl shadow-md border border-white/10"
+        initial={{ opacity: 0, x: 30 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.5 }}
       >
         <h3 className="text-white text-xl font-semibold mb-4">Assignments This Week</h3>
         <Bar data={activityBarData} />
@@ -137,14 +128,12 @@ const Charts = ({ assetPieData, activityBarData }) => {
   );
 };
 
-//recent assignments component
-
 const RecentAssignments = ({ assignments }) => (
   <motion.div
-    className="bg-white/10 p-6 rounded-xl shadow-md border border-white/10"
-    initial={{ opacity: 0, y: 40 }}
+    className="bg-white/5 p-6 rounded-xl shadow-md border border-white/10"
+    initial={{ opacity: 0, y: 30 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.8 }}
+    transition={{ duration: 0.6 }}
   >
     <h3 className="text-white text-xl font-semibold mb-4">Recent Assignments</h3>
     <ul className="divide-y divide-white/10">
@@ -159,4 +148,3 @@ const RecentAssignments = ({ assignments }) => (
     </ul>
   </motion.div>
 );
-
