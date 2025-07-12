@@ -211,3 +211,35 @@ exports.UserAssets = async (req, res) => {
       .json({ message: "Error fetching user's assets", error: err.message });
   }
 };
+//asset stats 
+
+exports.assetStats = async (req, res) => {
+  try {
+    const totalAssets = await Asset.countDocuments();
+    const assignedAssets = await Asset.countDocuments({ status: "assigned" });
+    const inStockAssets = await Asset.countDocuments({ status: "in_stock" });
+    const damagedAssets = await Asset.countDocuments({ status: "damaged" });
+    const repairAssets = await Asset.countDocuments({ status: "repair" });
+    const discardedAssets = await Asset.countDocuments({ status: "discarded" });
+    const retrievedAssets = await Asset.countDocuments({ status: "retrieved" });
+    const toBeRetrieved = await Asset.countDocuments({ status: "to_be_retrieved" });
+
+    const laptopCount = await Asset.countDocuments({ assetType: "laptop" });
+    const monitorCount = await Asset.countDocuments({ assetType: "monitor" });
+
+    res.status(200).json({
+      totalAssets,
+      assignedAssets,
+      inStockAssets,
+      damagedAssets,
+      repairAssets,
+      discardedAssets,
+      retrievedAssets,
+      toBeRetrieved,
+      laptopCount,
+      monitorCount,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching asset stats", error: err.message });
+  }
+};
