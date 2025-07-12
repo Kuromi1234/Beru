@@ -14,6 +14,7 @@ import ResetUserPassword from "./pages/admin/ResetUserPassword";
 import AllAssets from "./pages/admin/AllAssets";
 import AllUsers from "./pages/admin/AllUsers";
 import AddUser from "./pages/admin/AddUser";
+import AdminPrivateRoute from "./components/AdminPrivateRoutes";
 
 const App = () => {
   return (
@@ -27,7 +28,8 @@ const App = () => {
       <Route path="/resetpassword" element={<ResetPassword />} />
 
       {/* Admin Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route path="/admin" element={<AdminPrivateRoute/>}>
+        <Route path="" element={<AdminLayout />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="reset-user-password" element={<ResetUserPassword />} />
         <Route path="assets" element={<AllAssets />} />
