@@ -213,33 +213,46 @@ exports.UserAssets = async (req, res) => {
 };
 //asset stats 
 
-exports.assetStats = async (req, res) => {
+exports.getDashboardStats = async (req, res) => {
   try {
     const totalAssets = await Asset.countDocuments();
-    const assignedAssets = await Asset.countDocuments({ status: "assigned" });
-    const inStockAssets = await Asset.countDocuments({ status: "in_stock" });
-    const damagedAssets = await Asset.countDocuments({ status: "damaged" });
-    const repairAssets = await Asset.countDocuments({ status: "repair" });
-    const discardedAssets = await Asset.countDocuments({ status: "discarded" });
-    const retrievedAssets = await Asset.countDocuments({ status: "retrieved" });
-    const toBeRetrieved = await Asset.countDocuments({ status: "to_be_retrieved" });
+    const in_stock = await Asset.countDocuments({ status: "in_stock" });
+    const assigned = await Asset.countDocuments({ status: "assigned" });
+    const damaged = await Asset.countDocuments({ status: "damaged" });
+    const repair = await Asset.countDocuments({ status: "repair" });
+    const to_be_retrieved = await Asset.countDocuments({ status: "to_be_retrieved" });
+    const retrieved = await Asset.countDocuments({ status: "retrieved" });
+    const discarded = await Asset.countDocuments({ status: "discarded" });
 
-    const laptopCount = await Asset.countDocuments({ assetType: "laptop" });
-    const monitorCount = await Asset.countDocuments({ assetType: "monitor" });
+    const totalUsers = await User.countDocuments({ role: "it" });
+    const totalAssignedAssets = await Asset.countDocuments({ assignedTo: { $ne: null } });
+
+    const recentAdded = await Asset.find().sort({ createdAt: -1 }).limit(5);
+    const recentAssigned = await Asset.find({ status: "assigned" })
+      .sort({ assignedDate: -1 })
+      .limit(5)
+      .populate("assignedTo", "name email");
+    const recentRetrieved = await Asset.find({ status: "retrieved" })
+      .sort({ returnDate: -1 })
+      .limit(5)
+      .populate("assignedTo", "name email");
 
     res.status(200).json({
       totalAssets,
-      assignedAssets,
-      inStockAssets,
-      damagedAssets,
-      repairAssets,
-      discardedAssets,
-      retrievedAssets,
-      toBeRetrieved,
-      laptopCount,
-      monitorCount,
+      in_stock,
+      assigned,
+      damaged,
+      repair,
+      to_be_retrieved,
+      retrieved,
+      discarded,
+      totalUsers,
+      totalAssignedAssets,
+      recentAdded,
+      recentAssigned,
+      recentRetrieved,
     });
   } catch (err) {
-    res.status(500).json({ message: "Error fetching asset stats", error: err.message });
+    res.status(500).json({ message: "Error fetching dashboard stats", error: err.message });
   }
 };
