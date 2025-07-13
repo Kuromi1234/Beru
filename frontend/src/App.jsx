@@ -7,7 +7,6 @@ import ForgotPassword from "./pages/forgotPassword";
 import Verifyotp from "./pages/VerifyOTP";
 import ResetPassword from "./pages/ResetPassword";
 
-// ✅ FIXED: Default import
 import AdminLayout from "./pages/admin/AdminLayoutTemp";
 import Dashboard from "./pages/admin/Dashboard";
 import ResetUserPassword from "./pages/admin/ResetUserPassword";
@@ -28,15 +27,15 @@ const App = () => {
       <Route path="/resetpassword" element={<ResetPassword />} />
 
       {/* Admin Routes */}
-      <Route path="/admin" element={<AdminPrivateRoute/>}>
-        <Route path="" element={<AdminLayout />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="reset-user-password" element={<ResetUserPassword />} />
-        <Route path="assets" element={<AllAssets />} />
-        <Route path="users" element={<AllUsers />} />
-        <Route path="add-user" element={<AddUser />} />
-
-
+      <Route path="/admin" element={<AdminPrivateRoute />}>
+        <Route element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="reset-user-password" element={<ResetUserPassword />} />
+          <Route path="assets" element={<AllAssets />} />
+          <Route path="users" element={<AllUsers />} />
+          <Route path="add-user" element={<AddUser />} />
+        </Route>
       </Route>
     </Routes>
   );
