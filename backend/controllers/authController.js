@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 // Registration
 exports.register = async (req, res) => {
   try {
-    const { empid , name, email, password, department } = req.body;
+    const { empid, name, email, password, department } = req.body;
     if (department !== "IT") {
       return res
         .status(403)
@@ -30,19 +30,17 @@ exports.register = async (req, res) => {
 
     await newUser.save();
     const userobj = newUser.toObject();
-    delete userobj.password , userobj.email , userobj.role ; 
-    res
-      .status(200)
-      .json({
-        message: "User registered successfully , Now Enjoy and login !",
-        user: userobj,
-      });
+    delete userobj.password, userobj.email, userobj.role;
+    res.status(200).json({
+      message: "User registered successfully , Now Enjoy and login !",
+      user: userobj,
+    });
   } catch (err) {
     return res
       .status(500)
       .json({ message: "server side error", error: err.message });
   }
-  console.log("bale bale , register hogaya")
+  console.log("bale bale , register hogaya");
 };
 
 // Login
@@ -66,9 +64,9 @@ exports.login = async (req, res) => {
 
     res.status(200).json({
       token,
-      message:"user logged in successfully ",
+      message: "user logged in successfully ",
       user: {
-        id:foundUser.id,
+        id: foundUser.id,
         name: foundUser.name,
         email: foundUser.email,
         role: foundUser.role,
@@ -76,5 +74,18 @@ exports.login = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+//get all users
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, "-password");
+    res.status(200).json({ users });
+  } catch (err) {
+    console.error("Error fetching users:", err.message);
+    res
+      .status(500)
+      .json({ message: "Failed to fetch users", error: err.message });
   }
 };
