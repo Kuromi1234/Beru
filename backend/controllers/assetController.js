@@ -224,7 +224,7 @@ exports.getDashboardStats = async (req, res) => {
     const retrieved = await Asset.countDocuments({ status: "retrieved" });
     const discarded = await Asset.countDocuments({ status: "discarded" });
 
-    const totalUsers = await User.countDocuments({ role: "it" });
+    const totalUsers = await User.countDocuments( { role: { $ne: "admin" } }); // Exclude admins from user count
     const totalAssignedAssets = await Asset.countDocuments({ assignedTo: { $ne: null } });
 
     const recentAdded = await Asset.find().sort({ createdAt: -1 }).limit(5);
