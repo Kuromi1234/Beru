@@ -36,7 +36,9 @@ export default function AllAssets() {
       (a) =>
         a.name.toLowerCase().includes(value) ||
         a.serialNumber.toLowerCase().includes(value) ||
-        a.model.toLowerCase().includes(value)
+        a.model.toLowerCase().includes(value) ||
+        a.assetType.toLowerCase().includes(value) ||
+        a.status.toLowerCase().includes(value) 
     );
     setFiltered(filteredData);
     setPage(1); // Reset to first page
