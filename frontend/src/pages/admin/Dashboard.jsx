@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import {
-  FaLaptop, FaCheckCircle, FaTimesCircle, FaUsers, FaPlusCircle, FaUndo
+  FaLaptop,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaUsers,
+  FaUndo 
 } from "react-icons/fa";
 import { Bar } from "react-chartjs-2";
 import {
@@ -17,31 +21,37 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const Dashboard = () => {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    in_stock: 0,
+    assigned: 0,
+    damaged: 0,
+    repair: 0,
+    to_be_retrieved: 0,
+    retrieved: 0,
+    discarded: 0,
+    totalAssets: 0,
+    totalUsers: 0,
+    totalAssignedAssets: 0,
+    recentAdded: [],
+    recentAssigned: [],
+    recentRetrieved: []
+  });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
-
         const res = await axios.get("http://localhost:5000/api/assets/stats", {
           headers: { Authorization: `Bearer ${token}` }
         });
-
         setStats(res.data);
       } catch (err) {
         console.error("Failed to fetch stats:", err.message);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchStats();
   }, []);
-
-  if (loading) return <div className="text-center text-white mt-20">Loading dashboard...</div>;
-  if (!stats) return <div className="text-center text-red-400 mt-20">Failed to load stats.</div>;
 
   const chartData = {
     labels: ["In Stock", "Assigned", "Damaged", "Repair", "To Be Retrieved", "Retrieved", "Discarded"],
@@ -53,33 +63,43 @@ const Dashboard = () => {
         stats.retrieved, stats.discarded
       ],
       backgroundColor: [
-        "#6EE7B7", "#93C5FD", "#FCA5A5",
-        "#FCD34D", "#DDD6FE", "#A7F3D0", "#F9A8D4"
+        "#4ADE80", "#60A5FA", "#F87171",
+        "#FBBF24", "#C4B5FD", "#34D399", "#F472B6"
       ],
-      borderRadius: 8
+      borderRadius: 6,
+      barThickness: 30
     }]
   };
 
-  const StatCard = ({ title, value, icon, gradient }) => (
+  const StatCard = ({ title, value, icon, fromColor, toColor }) => (
     <motion.div
-      whileHover={{ scale: 1.04 }}
-      className={`p-6 ${gradient} text-white rounded-xl shadow-lg transition-all duration-300`}
+      whileHover={{ scale: 1.03 }}
+      className={`p-6 bg-gradient-to-br from-${fromColor} to-${toColor} 
+        rounded-xl text-white shadow-xl 
+        transition-all duration-300 border border-white/10`}
+      style={{
+        background: 'linear-gradient(135deg, #4c1d95, #6b21a8)',
+        boxShadow: "0 8px 24px rgba(255, 255, 255, 0.05)",
+        transform: "translateZ(0)"
+      }}
     >
-      <h3 className="text-lg font-medium mb-2">{title}</h3>
-      <p className="text-3xl font-bold flex items-center gap-2">{icon} {value}</p>
+      <h3 className="text-md font-semibold mb-2 text-white/80">{title}</h3>
+      <p className="text-3xl font-bold flex items-center gap-2">{icon} {value ?? 0}</p>
     </motion.div>
   );
 
   const RecentList = ({ title, data }) => (
-    <div className="bg-white/5 border border-white/10 backdrop-blur-md p-4 rounded-xl">
-      <h4 className="text-white text-lg font-semibold mb-3">{title}</h4>
+    <div className="bg-white/5 border border-white/10 p-4 rounded-xl shadow-inner">
+      <h4 className="text-white text-md font-semibold mb-3">{title}</h4>
       {data.length === 0 ? (
-        <p className="text-gray-400 text-sm">No data available.</p>
+        <p className="text-gray-400 text-sm">No records found.</p>
       ) : (
         <ul className="text-sm text-gray-300 space-y-2">
           {data.map((asset, idx) => (
-            <li key={idx} className="flex flex-col bg-black/20 p-2 rounded-md">
-              <span className="text-purple-300 font-medium">{asset.name} ({asset.assetType})</span>
+            <li key={idx} className="flex flex-col bg-black/30 p-3 rounded-md shadow-sm hover:bg-black/40">
+              <span className="text-purple-300 font-medium">
+                {asset.name} ({asset.assetType})
+              </span>
               {asset.assignedTo && (
                 <span className="text-xs text-gray-400">
                   Assigned to: {asset.assignedTo.name} ({asset.assignedTo.email})
@@ -93,34 +113,40 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      {/* Top stats */}
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="max-w-7xl mx-auto px-6 py-10"
+    >
+      {/* Top Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <StatCard title="Total Assets" value={stats.totalAssets} icon={<FaLaptop />} gradient="bg-gradient-to-br from-purple-600 to-indigo-600" />
-        <StatCard title="In Stock" value={stats.in_stock} icon={<FaCheckCircle />} gradient="bg-gradient-to-br from-green-500 to-emerald-600" />
-        <StatCard title="Assigned" value={stats.assigned} icon={<FaUsers />} gradient="bg-gradient-to-br from-yellow-400 to-orange-500" />
-        <StatCard title="Damaged" value={stats.damaged} icon={<FaTimesCircle />} gradient="bg-gradient-to-br from-red-500 to-rose-600" />
+        <StatCard title="Total Assets" value={stats.totalAssets} icon={<FaLaptop />} fromColor="purple-700/60" toColor="indigo-600/60" />
+        <StatCard title="In Stock" value={stats.in_stock} icon={<FaCheckCircle />} fromColor="green-600/50" toColor="emerald-600/50" />
+        <StatCard title="Assigned" value={stats.assigned} icon={<FaUsers />} fromColor="yellow-500/40" toColor="orange-500/50" />
+        <StatCard title="Damaged" value={stats.damaged} icon={<FaTimesCircle />} fromColor="rose-500/40" toColor="red-600/50" />
       </div>
 
-      {/* More stats */}
+      {/* Mid Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        <StatCard title="Total IT Users" value={stats.totalUsers} icon={<FaUsers />} gradient="bg-gradient-to-br from-cyan-500 to-blue-500" />
-        <StatCard title="Assigned to Users" value={stats.totalAssignedAssets} icon={<FaCheckCircle />} gradient="bg-gradient-to-br from-pink-500 to-fuchsia-600" />
+        <StatCard title="Total IT Users" value={stats.totalUsers} icon={<FaUsers />} fromColor="blue-700/50" toColor="cyan-500/50" />
+        <StatCard title="Assigned to Users" value={stats.totalAssignedAssets} icon={<FaCheckCircle />} fromColor="pink-600/50" toColor="fuchsia-600/50" />
+        <StatCard title="Retrieved Assets" value={stats.retrieved} icon={<FaUndo />} fromColor="gray-600/50" toColor="gray-400/50" />
       </div>
 
-      {/* Chart */}
-      <div className="bg-white/10 border border-white/10 rounded-xl p-6 mb-12 shadow-md">
-        <h2 className="text-xl font-bold text-white mb-4">Asset Distribution Overview</h2>
-        <Bar data={chartData} />
+      {/* Bar Chart */}
+      <div className="bg-white/10 border border-white/10 rounded-xl p-6 mb-12 shadow-md ">
+        <h2 className="text-xl font-semibold text-white mb-4">📊 Asset Distribution Overview</h2>
+        <Bar data={chartData} options={{ plugins: { legend: { labels: { color: "white" } } } }} />
       </div>
 
-      {/* Recent Activities */}
+      {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <RecentList title="Recently Added Assets" data={stats.recentAdded} />
-        <RecentList title="Recently Assigned Assets" data={stats.recentAssigned} />
-        <RecentList title="Recently Retrieved Assets" data={stats.recentRetrieved} />
+        <RecentList title="🆕 Recently Added Assets" data={stats.recentAdded} />
+        <RecentList title="✅ Recently Assigned" data={stats.recentAssigned} />
+        <RecentList title="🔁 Recently Retrieved" data={stats.recentRetrieved} />
       </div>
-    </div>
+    </motion.div>
   );
 };
 
