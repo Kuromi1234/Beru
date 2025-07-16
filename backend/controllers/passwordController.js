@@ -41,7 +41,7 @@ exports.resetPassword = async (req, res) => {
 
   user.password = await bcrypt.hash(newPassword, 10);
   await user.save();
-  await ResetToken.deleteOne({ _id: resetToken._id });
+  await ResetToken.deleteOne({ _id: resetToken._id });  
 
   res
     .status(200)
