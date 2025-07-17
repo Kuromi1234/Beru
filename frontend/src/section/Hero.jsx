@@ -4,11 +4,24 @@ import "../App.css"; // Ensure you have the glow effects and custom fonts
 
 const Hero = () => {
   const navigate = useNavigate();
+
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-gradient-to-br from-black via-slate-900 to-zinc-800 text-white overflow-hidden">
-      {/* Background Animated Glow Shape */}
+
+      {/* Animated Glow Effects */}
       <div className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-purple-600/30 rounded-full blur-3xl animate-pulse z-0" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-pink-500/20 rounded-full blur-2xl animate-pulse z-0" />
+
+      {/* 🔥 Spline Embed - Blended with Background */}
+      <div className="absolute inset-0 w-full h-full z-0 opacity-30 pointer-events-none">
+        <iframe
+          src="https://my.spline.design/squarechipsfallinginplace-7Sra50icmIA1Q6Q6n0Dy4RKC/"
+          frameBorder="0"
+          width="100%"
+          height="100%"
+          className="w-full h-full"
+        ></iframe>
+      </div>
 
       {/* Hero Content */}
       <motion.h1
@@ -31,7 +44,6 @@ const Hero = () => {
         Scalable.
       </motion.p>
 
-      {/* Call to Action Button with Shimmer */}
       <motion.button
         onClick={() => navigate("/register")}
         initial={{ opacity: 0, scale: 0.8 }}
@@ -42,9 +54,6 @@ const Hero = () => {
         <span className=" relative z-10">Get Started</span>
         <span className="absolute top-0 left-0 w-full h-full bg-white/10 opacity-0 group-hover:opacity-100 transition duration-500 animate-glow" />
       </motion.button>
-
-      {/* Parallax Floating Icons or Particles Placeholder */}
-      {/* Optional: Add canvas or floating icons here for more cinematic impact */}
     </section>
   );
 };
