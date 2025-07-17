@@ -1,33 +1,15 @@
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import devImage from "../assets/dev.jpg";
-import devVideo from "../assets/arjun.mp4";
 import "../App.css"; // Include glow, font, particles
 
 const Developer = () => {
-  const videoRef = useRef(null);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-
-  const handleMouseEnter = () => {
-    if (videoRef.current) {
-      setIsVideoPlaying(true);
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
-    }
-  };
-
-  const handleVideoEnd = () => {
-    setIsVideoPlaying(false);
-  };
-
   return (
     <section
       className="min-h-screen flex flex-col md:flex-row items-center justify-between px-8 md:px-20 gap-6 py-20 bg-gradient-to-br from-black via-gray-900 to-zinc-800 relative overflow-hidden"
     >
       {/* Particle Background */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute w-full h-full animate-particleMove bg-[url('/particles.svg')] bg-repeat opacity-20"></div>
-      </div>
+      
 
       {/* Text Section */}
       <motion.div
@@ -50,27 +32,15 @@ const Developer = () => {
       <motion.div
         whileHover={{ scale: 1.05, rotateY: 5 }}
         transition={{ type: "spring", stiffness: 100 }}
-        className="relative group cursor-pointer max-w-md"
-        onMouseEnter={handleMouseEnter}
+        className="relative group cursor-pointer max-w-md box"
       >
         <div className="bg-white/10 backdrop-blur-lg p-6 rounded-3xl shadow-2xl border border-white/20 overflow-hidden relative">
           {/* Image */}
           <motion.img
             src={devImage}
             alt="Arjun Nath"
-            className={`w-full h-64 object-cover rounded-2xl transition-opacity duration-500 ${isVideoPlaying ? 'opacity-0' : 'opacity-100'}`}
+            className={`w-full h-64 object-cover rounded-2xl transition-opacity `}
           />
-
-          {/* Video */}
-          <motion.video
-            ref={videoRef}
-            onEnded={handleVideoEnd}
-            muted={false}
-            controls={false}
-            className={`w-full h-64 object-cover rounded-2xl absolute top-0 left-0 transition-opacity duration-500 ${isVideoPlaying ? 'opacity-100' : 'opacity-0'}`}
-          >
-            <source src={devVideo} type="video/mp4" />
-          </motion.video>
 
           <h3 className="mt-6 text-2xl font-bold text-white">Arjun Nath</h3>
           <p className="text-slate-300 mt-1">System Engineer | Product Builder</p>
