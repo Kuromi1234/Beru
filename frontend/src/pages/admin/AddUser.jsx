@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
 
 export default function AddUser() {
   const [formData, setFormData] = useState({
@@ -9,6 +13,7 @@ export default function AddUser() {
     password: "",
     department: "IT",
   });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -17,17 +22,36 @@ export default function AddUser() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
-    alert("User added successfully (UI Only)");
-    setFormData({
-      empid: "",
-      name: "",
-      email: "",
-      password: "",
-      department: "IT",
-    });
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success("✅ User added successfully!");
+      setFormData({
+        empid: "",
+        name: "",
+        email: "",
+        password: "",
+        department: "IT",
+      });
+
+      await new Promise((res) => setTimeout(res, 100));
+      navigate("/admin/users");
+    } catch (err) {
+      console.error("Error adding user:", err.response?.data || err.message);
+      toast.error(err.response?.data?.message || "Failed to add user");
+    }
   };
 
   return (
