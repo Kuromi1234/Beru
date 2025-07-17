@@ -54,7 +54,7 @@ export default function AllUsers() {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/auth/users/${id}`, {
+      await axios.delete(`http://localhost:5000/api/admin/deleteuser/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
