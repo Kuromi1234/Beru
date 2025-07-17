@@ -30,7 +30,7 @@ export default function ResetUserPassword() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `http://localhost:5000/api/users/adminpsswd/${userId}`,
+        `http://localhost:5000/api/admin/adminpsswd/${userId}`,
         { newPassword },
         {
           headers: {
