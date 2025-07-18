@@ -6,7 +6,7 @@ const { allowRoles } = require("../middleware/checkrole");
 
 // Routes
 router.post("/add", verifyToken, allowRoles("admin", "IT"), createAsset);
-router.get("/stats", verifyToken, allowRoles("admin"), getDashboardStats);
+router.get("/stats", verifyToken, allowRoles("admin","IT"), getDashboardStats);
 router.get("/getall", verifyToken, allowRoles("admin", "IT"), getAllAssets);
 router.put("/assign", verifyToken, allowRoles("admin", "IT"), assign);
 router.put("/retrieve", verifyToken, allowRoles("admin", "IT"), returnAsset);
