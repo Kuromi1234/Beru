@@ -19,19 +19,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    empid: {
+    employeeId: { // previously empid
       type: String,
       required: true,
       unique: true,
     },
-
     role: {
       type: String,
       enum: ["admin", "IT", "Employee"],
       default: "Employee",
     },
   },
-  { timestamps: true }
-); //adds createdat and updated at automatically
+  { timestamps: true } // adds createdAt and updatedAt
+);
 
 module.exports = mongoose.model("user", userSchema);
