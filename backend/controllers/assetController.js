@@ -1,33 +1,35 @@
 const Asset = require("../models/asset");
 const User = require("../models/user");
 
+// Create a new asset (supports immediate assignment if user empid provided)
 exports.createAsset = async (req, res) => {
   try {
-    const { name, serialNumber, description, model, assetType, status } =
-      req.body;
+    const { name, serialNumber, description, model, assetType, status, empid } = req.body;
 
-    // Check for duplicate serial number
     const existing = await Asset.findOne({ serialNumber });
     if (existing) {
-      return res.status(400).json({
-        message: "Asset exists, duplicate asset creation not allowed!",
-      });
+      return res.status(400).json({ message: "Asset already exists with this serial number." });
     }
 
-    // Create new asset
-    const newAsset = new Asset({
-      name,
-      serialNumber,
-      description,
-      model,
-      assetType,
-      status: status || "in_stock",
-    });
+    const newAsset = new Asset({ name, serialNumber, description, model, assetType });
+
+    // If being assigned directly
+    if (status === "assigned" && empid) {
+      const user = await User.findOne({ empid });
+      if (!user) {
+        return res.status(404).json({ message: "User with given empid not found" });
+      }
+      newAsset.assignedTo = user._id;
+      newAsset.status = "assigned";
+      newAsset.assignedDate = new Date();
+    } else {
+      newAsset.status = status || "in_stock";
+    }
 
     await newAsset.save();
 
     res.status(201).json({
-      message: "New Asset added. Keep track of it, IT folks!",
+      message: "New Asset added successfully",
       asset: newAsset,
     });
   } catch (err) {
@@ -35,184 +37,154 @@ exports.createAsset = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-//get all assests
 
+// Get all assets
 exports.getAllAssets = async (req, res) => {
   try {
-    const assets = await Asset.find().populate("assignedTo", "name email");
+    const assets = await Asset.find().populate("assignedTo", "name empid email");
     res.status(200).json(assets);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-//get assets by id
+
+// Get asset by ID
 exports.getAssetById = async (req, res) => {
   try {
-    const asset = await Asset.findById(req.params.id).populate(
-      "assignedTo",
-      "name email"
-    );
+    const asset = await Asset.findById(req.params.id).populate("assignedTo", "name empid email");
     if (!asset) return res.status(404).json({ message: "Asset not found" });
     res.status(200).json(asset);
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error fetching asset", error: err.message });
+    res.status(500).json({ message: "Error fetching asset", error: err.message });
   }
 };
 
-//assign asset
+// Assign asset to user (by empid)
 exports.assign = async (req, res) => {
   try {
-    const { assetID, userID } = req.body;
-    const asset = await Asset.findOne({ _id: assetID });
-    const user = await User.findOne({ _id: userID });
+    const { assetID, empid } = req.body;
+
+    const asset = await Asset.findById(assetID);
+    const user = await User.findOne({ empid });
 
     if (!asset || !user) {
-      res.status(404).json({ message: "Asset or User doesn't exists ! " });
+      return res.status(404).json({ message: "Asset or User not found" });
     }
+
     if (asset.status === "assigned") {
-      res.status(400).json({ meassage: "Asset is already assigned !" });
+      return res.status(400).json({ message: "Asset is already assigned" });
     }
+
     asset.assignedTo = user._id;
     asset.status = "assigned";
     asset.assignedDate = new Date();
 
     await asset.save();
+
     res.status(200).json({ message: `Asset assigned to ${user.name}`, asset });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error assigning asset", error: err.message });
+    res.status(500).json({ message: "Error assigning asset", error: err.message });
   }
 };
 
-//asset retrieve
+// Retrieve asset from user (by empid)
 exports.returnAsset = async (req, res) => {
   try {
-    const { assetId, userID } = req.body;
+    const { assetId, empid } = req.body;
 
     const asset = await Asset.findById(assetId);
-    const user = await User.findById({ _id: userID });
-    if (!asset) {
-      
-      return res.status(404).json({ message: "Asset not found!" });
-    }
-    if (!user) {
-      return res.status(404).json({ message: "User not found!" });
+    const user = await User.findOne({ empid });
+
+    if (!asset || !user) {
+      return res.status(404).json({ message: "Asset or User not found!" });
     }
 
     if (!asset.assignedTo) {
-      return res
-        .status(400)
-        .json({ message: "Asset is not currently assigned." });
+      return res.status(400).json({ message: "Asset is not assigned" });
     }
 
-    asset.status = "in_stock";
+    asset.status = "retrieved";
     asset.assignedTo = null;
     asset.returnDate = new Date();
 
     await asset.save();
 
     res.status(200).json({
-      message: `Asset retrieved successfully from ${user.name} and put back in Stock '`,
+      message: `Asset retrieved from ${user.name} and marked as retrieved.`,
       asset,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error processing return", error: err.message });
+    res.status(500).json({ message: "Error processing return", error: err.message });
   }
 };
 
-//controller logic for other status i.e., repair, damaged , to-be-retrieved that will be set by IT
-
+// Update asset lifecycle status (unified endpoint)
 exports.updateAssets = async (req, res) => {
   try {
     const { assetID, assetStatus } = req.body;
 
     if (!assetID || !assetStatus) {
-      return res
-        .status(400)
-        .json({ message: "Asset ID and Asset-Status is required mate!" });
+      return res.status(400).json({ message: "Asset ID and status are required" });
     }
 
     const allowedStatuses = [
-      "in_stock",
-      "assigned",
-      "retrieved",
-      "to_be_retrieved",
-      "damaged",
-      "repair",
-      "discarded",
+      "in_stock", "assigned", "retrieved", "to_be_retrieved", "damaged", "repair", "discarded",
     ];
 
     if (!allowedStatuses.includes(assetStatus)) {
-      return res.status(400).json({ message: "The input is not valid" });
+      return res.status(400).json({ message: "Invalid asset status provided" });
     }
 
-    const asset = await Asset.findById(assetID); // FIXED THIS LINE
+    const asset = await Asset.findById(assetID);
     if (!asset) {
       return res.status(404).json({ message: "Asset not found!" });
     }
 
-    // Update status
     asset.status = assetStatus;
     await asset.save();
 
     res.status(200).json({
-      message: `Asset status updated to '${assetStatus}' successfully.`,
+      message: `Asset status updated to '${assetStatus}'`,
       asset,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error updating status", error: err.message });
+    res.status(500).json({ message: "Error updating asset", error: err.message });
   }
 };
-// asset delete only admin permission
 
+// Delete an asset (admin only)
 exports.deleteasset = async (req, res) => {
   try {
     const { id } = req.params;
     const asset = await Asset.findByIdAndDelete(id);
+
     if (!asset) {
-      return res.status(404).json({
-        message: "The assset your are trying to delete doesn't exist Mr.admin!",
-      });
+      return res.status(404).json({ message: "Asset not found" });
     }
-    res
-      .status(200)
-      .json({ message: "The Asset has been deleted successfully " ,asset });
+
+    res.status(200).json({ message: "Asset deleted successfully", asset });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ message: "Error deleting asset", error: err.message });
+    res.status(500).json({ message: "Error deleting asset", error: err.message });
   }
 };
-//get all assets assigned to the user
+
+// Get assets assigned to a user (by ID)
 exports.UserAssets = async (req, res) => {
   try {
     const userid = req.params.id;
-    const asset = await Asset.find({ assignedTo: userid}).populate(
-      "assignedTo",
-      "name email"
-    );
+    const asset = await Asset.find({ assignedTo: userid }).populate("assignedTo", "name empid email");
+
     if (!asset || asset.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No assets assigned to this user." });
+      return res.status(404).json({ message: "No assets assigned to this user" });
     }
 
     res.status(200).json({ message: "Assets fetched successfully", asset });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error fetching user's assets", error: err.message });
+    res.status(500).json({ message: "Error fetching user assets", error: err.message });
   }
 };
-//asset stats 
 
+// Dashboard Stats
 exports.getDashboardStats = async (req, res) => {
   try {
     const totalAssets = await Asset.countDocuments();
@@ -224,18 +196,17 @@ exports.getDashboardStats = async (req, res) => {
     const retrieved = await Asset.countDocuments({ status: "retrieved" });
     const discarded = await Asset.countDocuments({ status: "discarded" });
 
-    const totalUsers = await User.countDocuments( { role: { $ne: "admin" } }); // Exclude admins from user count
+    const totalUsers = await User.countDocuments({ role: { $ne: "admin" } });
     const totalAssignedAssets = await Asset.countDocuments({ assignedTo: { $ne: null } });
 
     const recentAdded = await Asset.find().sort({ createdAt: -1 }).limit(5);
     const recentAssigned = await Asset.find({ status: "assigned" })
-      .sort({ assignedDate: -1 })
-      .limit(5)
-      .populate("assignedTo", "name email");
+      .sort({ assignedDate: -1 }).limit(5)
+      .populate("assignedTo", "name empid email");
+
     const recentRetrieved = await Asset.find({ status: "retrieved" })
-      .sort({ returnDate: -1 })
-      .limit(5)
-      .populate("assignedTo", "name email");
+      .sort({ returnDate: -1 }).limit(5)
+      .populate("assignedTo", "name empid email");
 
     res.status(200).json({
       totalAssets,
