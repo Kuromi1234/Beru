@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const resetTokenSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "user", // model name should match the actual export in user.model.js (case-sensitive)
     required: true,
     unique: true,
   },
@@ -14,7 +14,7 @@ const resetTokenSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 900, // expires in 15 minutes
+    expires: 900, // auto-delete after 15 minutes (900s)
   },
 });
 
