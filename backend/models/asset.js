@@ -20,27 +20,58 @@ const assetSchema = new mongoose.Schema(
     },
     assetType: {
       type: String,
-      enum: ["Laptop", "Monitor", "Keyboard", "Mouse", "Phone", "Other"],
+      enum: ["Laptop", "Monitor", "Keyboard", "Mouse", "desktop", "Other"],
       required: true,
     },
-    status: {  
+    status: {
       type: String,
-      enum: ["in_stock", "assigned", "retrieved","to_be_retrieved", "damaged", "repair", "discarded"],
+      enum: ["in_stock", "assigned", "retrieved", "to_be_retrieved", "damaged", "repair", "discarded"],
       default: "in_stock",
     },
+
+    // When asset is currently assigned to someone
     assignedTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-      default: null,
+      employeeId: {
+        type: String,
+        default: null,
+      },
+      name: {
+        type: String,
+        default: null,
+      },
     },
     assignedDate: {
       type: Date,
     },
+
+    // If asset has been retrieved back from a user
+    retrievedFrom: {
+      employeeId: {
+        type: String,
+        default: null,
+      },
+      name: {
+        type: String,
+        default: null,
+      },
+    },
     returnDate: {
       type: Date,
+    },
+
+    // If asset is marked to be retrieved from someone
+    toBeRetrievedFrom: {
+      employeeId: {
+        type: String,
+        default: null,
+      },
+      name: {
+        type: String,
+        default: null,
+      },
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Asset", assetSchema);  
+module.exports = mongoose.model("Asset", assetSchema);
