@@ -27,7 +27,7 @@ const Login = () => {
       if (user.role === "admin") {
         navigate("/admin");
       } else if (user.role === "IT") {
-        navigate("/IT/dashboard"); // prepare later
+        navigate("/it/dashboard"); // Redirect to IT dashboard
       } else {
         toast.error("❌ Unauthorized role!");
       }
