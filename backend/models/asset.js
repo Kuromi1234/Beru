@@ -39,6 +39,10 @@ const assetSchema = new mongoose.Schema(
         type: String,
         default: null,
       },
+      department: {
+        type: String,
+        default: null,
+      }
     },
     assignedDate: {
       type: Date,
