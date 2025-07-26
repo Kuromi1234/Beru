@@ -10,7 +10,7 @@ const {
   returnAsset,
   updateAssets,
   deleteasset,
-  UserAssets,
+  getAssignedAssetsForCurrentUser,
   getDashboardStats
 } = require("../controllers/assetController");
 
@@ -28,6 +28,6 @@ router.put("/retrieve", verifyToken, allowRoles("admin", "IT"), returnAsset);
 router.put("/update", verifyToken, allowRoles("admin", "IT"), updateAssets);
 router.get("/:id", verifyToken, allowRoles("admin", "IT"), getAssetById);
 router.delete("/delete/:id", verifyToken, allowRoles("admin","IT"), deleteasset);
-router.get("/user/:id", verifyToken, allowRoles("admin", "IT"), UserAssets);
+router.get("/assigned", verifyToken, allowRoles("admin", "IT"), getAssignedAssetsForCurrentUser);
 
 module.exports = router;
