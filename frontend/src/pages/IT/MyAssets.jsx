@@ -82,7 +82,7 @@ export default function MyAssets() {
       setAssets(response.data);
       setFiltered(response.data);
 
-      toast.success("✅ Assets loaded successfully");
+      
     } catch (err) {
       console.error("Fetch assets error:", err);
       toast.error("❌ Failed to fetch assets");
@@ -164,7 +164,7 @@ export default function MyAssets() {
 
       setEditingId(null);
       setEditForm({});
-
+      await fetchAssets();
       toast.success("✅ Asset updated successfully");
     } catch (err) {
       console.error("Update asset error:", err);
@@ -183,6 +183,7 @@ export default function MyAssets() {
     try {
       setLoading(true);
       await axios.delete(`${API_BASE_URL}/delete/${id}`, getAuthHeaders());
+      await fetchAssets();
 
       toast.success("✅ Asset deleted successfully");
     } catch (err) {
@@ -199,6 +200,7 @@ export default function MyAssets() {
     if (newStatus === "assigned") {
       setSelectedAssetForAssign(asset);
       setShowAssignModal(true);
+      
       return;
     }
 
@@ -231,7 +233,7 @@ export default function MyAssets() {
           await fetchAssets();
         }, 24 * 60 * 60 * 1000); // 24 hours in ms
       }
-
+      await fetchAssets();
       toast.success(`✅ Status changed to ${newStatus}`);
     }
   };
@@ -247,7 +249,7 @@ export default function MyAssets() {
         },
         getAuthHeaders()
       );
-
+      await fetchAssets();
       toast.success("✅ Asset assigned successfully");
       setShowAssignModal(false);
       setSelectedAssetForAssign(null);
