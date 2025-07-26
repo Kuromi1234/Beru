@@ -89,3 +89,37 @@ exports.getAllUsers = async (req, res) => {
       .json({ message: "Failed to fetch users", error: err.message });
   }
 };
+
+exports.getUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Fixed: Consistent response structure with other endpoints
+    res.status(200).json({
+      user: {
+        id: user._id,
+        empid: user.empid,
+        name: user.name,
+        email: user.email,
+        department: user.department,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
