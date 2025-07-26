@@ -19,6 +19,8 @@ import ITPrivateRoute from "./components/ITPrivateRoutes";
 import ITLayout from "./pages/IT/ITLayout";
 import ITDashboard from "./pages/IT/Dashboard";
 import MyAssets from "./pages/IT/MyAssets";
+import AddAssetPage from "./pages/IT/AddAssets";
+import ProfilePage from "./pages/IT/ProfilePage";
 
 const App = () => {
   return (
@@ -49,6 +51,9 @@ const App = () => {
           <Route index element={<ITDashboard />} />
           <Route path="dashboard" element={<ITDashboard />} />
           <Route path="assets" element={<MyAssets />} />
+          <Route path="add-asset" element={<AddAssetPage />} />
+          <Route path="profile" element={<ProfilePage/>}/>
+         
           
         </Route>
       </Route>
