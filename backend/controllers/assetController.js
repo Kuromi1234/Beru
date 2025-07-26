@@ -264,29 +264,29 @@ exports.deleteasset = async (req, res) => {
   }
 };
 
-// Get assets assigned to a user (by ID)
-exports.UserAssets = async (req, res) => {
+// Get assets assigned to currently logged-in user
+exports.getAssignedAssetsForCurrentUser = async (req, res) => {
   try {
-    const userid = req.params.id;
-    const asset = await Asset.find({ assignedTo: userid }).populate(
+    const userId = req.user._id; // Comes from the auth middleware
+
+    const assets = await Asset.find({ assignedTo: userId }).populate(
       "assignedTo",
       "name empid email"
     );
 
-    if (!asset || asset.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No assets assigned to this user" });
-    }
-
-    res.status(200).json({ message: "Assets fetched successfully", asset });
+    res.status(200).json({
+      success: true,
+      assets,
+    });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error fetching user assets", error: err.message });
+    console.error("Error fetching assigned assets:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch assigned assets",
+      error: err.message,
+    });
   }
 };
-
 // Dashboard Stats
 exports.getDashboardStats = async (req, res) => {
   try {
