@@ -53,8 +53,6 @@ const App = () => {
           <Route path="assets" element={<MyAssets />} />
           <Route path="add-asset" element={<AddAssetPage />} />
           <Route path="profile" element={<ProfilePage/>}/>
-         
-          
         </Route>
       </Route>
     </Routes>
