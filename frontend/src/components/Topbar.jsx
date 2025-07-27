@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { FaSignOutAlt, FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 export default function Topbar({ onMenuClick }) {
   const navigate = useNavigate();

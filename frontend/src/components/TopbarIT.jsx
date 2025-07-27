@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { FaSignOutAlt, FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react"; // <-- Import state hook
+import { useEffect, useState } from "react"; 
+import { toast } from "react-hot-toast";
 
 export default function Topbar({ onMenuClick }) {
   const navigate = useNavigate();
