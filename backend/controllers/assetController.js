@@ -1,5 +1,6 @@
 const Asset = require("../models/asset");
 const User = require("../models/user");
+const mongoose = require("mongoose");
 
 // Create a new asset
 exports.createAsset = async (req, res) => {
@@ -83,7 +84,6 @@ exports.assign = async (req, res) => {
   try {
     const { assetID, assetStatus, assignedTo } = req.body;
 
-    // Validate input
     if (
       !assetID ||
       !assignedTo?.empid ||
@@ -267,12 +267,12 @@ exports.deleteasset = async (req, res) => {
 // Get assets assigned to currently logged-in user
 exports.getAssignedAssetsForCurrentUser = async (req, res) => {
   try {
-    const userId = req.user._id; // Comes from the auth middleware
+    const userId = req.user._id; // From auth middleware
 
-    const assets = await Asset.find({ assignedTo: userId }).populate(
-      "assignedTo",
-      "name empid email"
-    );
+    const assets = await Asset.find({
+      assignedTo: userId, // No need to wrap in ObjectId
+      status: { $ne: "in_stock" }, // Optional: ensures truly assigned assets
+    }).populate("assignedTo", "name empid email");
 
     res.status(200).json({
       success: true,
@@ -287,6 +287,7 @@ exports.getAssignedAssetsForCurrentUser = async (req, res) => {
     });
   }
 };
+
 // Dashboard Stats
 exports.getDashboardStats = async (req, res) => {
   try {
