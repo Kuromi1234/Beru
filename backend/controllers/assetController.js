@@ -203,7 +203,7 @@ exports.updateAssets = async (req, res) => {
       });
     }
 
-    // Update logic depending on status
+    // Update asset status
     asset.status = assetStatus;
 
     if (
@@ -270,8 +270,8 @@ exports.getAssignedAssetsForCurrentUser = async (req, res) => {
     const userId = req.user._id; // From auth middleware
 
     const assets = await Asset.find({
-      assignedTo: userId, // No need to wrap in ObjectId
-      status: { $ne: "in_stock" }, // Optional: ensures truly assigned assets
+      assignedTo: userId, 
+      status: { $ne: "in_stock" }, 
     }).populate("assignedTo", "name empid email");
 
     res.status(200).json({
