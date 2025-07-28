@@ -3,10 +3,12 @@ import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../Context/AuthContext";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+  const { login } = useAuth(); // Correct method from context
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,18 +18,22 @@ const Login = () => {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", formData);
 
-      const { token, user } = res.data;
+      const { token, user, message } = res.data;
 
-      toast.success(res.data.message || "Logged in successfully!");
-
+      // Save to localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      // Route based on user role
+      // Update context
+      login(user); // This sets user in context
+
+      toast.success(message || "✅ Logged in successfully!");
+
+      // Role-based navigation
       if (user.role === "admin") {
         navigate("/admin");
       } else if (user.role === "IT") {
-        navigate("/it/dashboard"); // Redirect to IT dashboard
+        navigate("/it/dashboard");
       } else {
         toast.error("❌ Unauthorized role!");
       }
