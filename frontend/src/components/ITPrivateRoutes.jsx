@@ -1,13 +1,13 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Ensure correct path
 
 const ITPrivateRoute = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user } = useAuth();
 
-  // Check if logged in and role is 'IT'
-  if (user && user.role === "IT") {
+  if (user?.role === "IT") {
     return <Outlet />;
   } else {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 };
 
