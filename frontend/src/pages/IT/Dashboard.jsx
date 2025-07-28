@@ -96,7 +96,7 @@ const ITDashboard = () => {
         rounded-xl text-white shadow-xl 
         transition-all duration-300 border border-white/10`}
       style={{
-        background: "linear-gradient(135deg, #1e293b, #0f172a)",
+        background: "linear-gradient(135deg, #4c1d95, #6b21a8)",
         boxShadow: "0 8px 24px rgba(255, 255, 255, 0.05)",
         transform: "translateZ(0)",
       }}
