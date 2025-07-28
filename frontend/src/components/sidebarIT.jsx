@@ -7,6 +7,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 
 const links = [
   { to: "/it/dashboard", icon: <FaTachometerAlt />, label: "Dashboard" },
@@ -17,18 +18,21 @@ const links = [
 ];
 
 // Get dynamic IT user
-const user = JSON.parse(localStorage.getItem("user"));
-const name = user?.name || "IT User";
-const email = user?.email || "it@beru.ai";
 
 export default function sidebarIT({ closeSidebar }) {
+  const { user } = useAuth();
+  const name = user?.name || "IT User";
+  const email = user?.email || "it@beru.ai";
   return (
     <aside className="h-screen w-64 flex flex-col justify-between bg-white/10 backdrop-blur-xl border-r border-white/10 shadow-2xl text-white">
       <div>
         {/* Mobile Header */}
         <div className="flex items-center justify-between px-6 py-4 md:hidden">
           <span className="text-2xl font-bold text-purple-400">BERU IT</span>
-          <button onClick={closeSidebar} className="text-white hover:text-purple-300 transition">
+          <button
+            onClick={closeSidebar}
+            className="text-white hover:text-purple-300 transition"
+          >
             <FaTimes size={20} />
           </button>
         </div>

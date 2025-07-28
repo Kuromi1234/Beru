@@ -7,25 +7,34 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 
 const links = [
   { to: "/admin/dashboard", icon: <FaTachometerAlt />, label: "Dashboard" },
   { to: "/admin/assets", icon: <FaLaptop />, label: "All Assets" },
   { to: "/admin/users", icon: <FaUsers />, label: "All Users" },
   { to: "/admin/add-user", icon: <FaUserPlus />, label: "Add User" },
-  { to: "/admin/reset-user-password", icon: <FaUserCircle />, label: "Reset Password" },
+  {
+    to: "/admin/reset-user-password",
+    icon: <FaUserCircle />,
+    label: "Reset Password",
+  },
 ];
-const user = JSON.parse(localStorage.getItem("user"));
-const email = user?.email || "admin@beru.ai";
 
 export default function Sidebar({ closeSidebar }) {
+  const { user } = useAuth();
+  const name = user?.name || "admin";
+  const email = user?.email || "admin@beru.ai";
   return (
     <aside className="h-screen w-64 flex flex-col justify-between bg-white/10 backdrop-blur-xl border-r border-white/10 shadow-2xl text-white">
       <div>
         {/* Mobile Header */}
         <div className="flex items-center justify-between px-6 py-4 md:hidden">
           <span className="text-2xl font-bold text-purple-400">BERU Admin</span>
-          <button onClick={closeSidebar} className="text-white hover:text-purple-300 transition">
+          <button
+            onClick={closeSidebar}
+            className="text-white hover:text-purple-300 transition"
+          >
             <FaTimes size={20} />
           </button>
         </div>
@@ -61,7 +70,8 @@ export default function Sidebar({ closeSidebar }) {
           <FaUserCircle size={28} className="text-purple-300" />
           <div>
             <p className="text-xs text-slate-400">Logged in as</p>
-            <p className="text-sm font-semibold">{email}</p>
+            <p className="text-sm font-semibold">{name}</p>
+            <p className="text-[11px] text-slate-500">{email}</p>
           </div>
         </div>
       </div>
