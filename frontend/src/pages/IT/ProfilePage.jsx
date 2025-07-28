@@ -1,84 +1,65 @@
-import React, { useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
+import { useAuth} from "../../context/AuthContext";
 import axios from "axios";
-import toast from "react-hot-toast";
+import ProfileHeader from "../../components/profile/ProfileHeader";
+import AssignedAssetCard from "../../components/profile/AssignedAssetCard";
+import SkeletonLoader from "../../components/profile/SkeletonLoader";
+import EmptyState from "../../components/profile/EmptyState";
+import { motion } from "framer-motion";
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null);
-  const [assets, setAssets] = useState([]);
+  const { user } = useAuth();
+  const [assignedAssets, setAssignedAssets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found. Please login again.");
-
-      const res = await axios.get("/api/auth/profile", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // Fixed: Access user from correct response structure
-      const user = res.data.user; // Direct access since backend returns { user }
-      setUser(user);
-    } catch (err) {
-      console.error("User fetch error:", err);
-      toast.error(err?.response?.data?.message || "Failed to fetch user");
-    }
-  };
-
-  const fetchUserAssets = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found. Please login again.");
-
-      const res = await axios.get("/api/assets/assigned", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setAssets(res.data.assets || []);
-    } catch (err) {
-      console.error("Assets fetch error:", err);
-      toast.error(err?.response?.data?.message || "Failed to fetch assets");
-    }
-  };
-
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      await fetchUserData();
-      await fetchUserAssets();
-      setLoading(false);
+    const fetchAssignedAssets = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("http://localhost:5000/api/assets/assigned", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setAssignedAssets(res.data.assets);
+
+      } catch (err) {
+        console.error("Error fetching assigned assets", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    load();
+    fetchAssignedAssets();
   }, []);
 
-  if (loading) return <div className="p-6 text-white">Loading...</div>;
-
-  if (!user)
-    return <div className="p-6 text-red-400">⚠️ Failed to load profile</div>;
-
   return (
-    <div className="p-6 text-white">
-      <h2 className="text-2xl font-bold mb-2">Welcome, {user.name}</h2>
-      <p className="mb-4 text-gray-400">{user.email}</p>
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="max-w-6xl mx-auto px-6 py-10"
+    >
+      <ProfileHeader user={user} />
 
-      <h3 className="text-xl font-semibold mt-6 mb-2">Assigned Assets:</h3>
-      {assets.length === 0 ? (
-        <p className="text-gray-500">No assets assigned.</p>
+      <h2 className="text-xl text-white font-semibold mb-4">
+        🎒 Assigned Assets
+      </h2>
+
+      {loading ? (
+        <>
+          <SkeletonLoader />
+          <SkeletonLoader />
+          <SkeletonLoader />
+        </>
+      ) : assignedAssets.length === 0 ? (
+        <EmptyState />
       ) : (
-        <ul className="list-disc list-inside">
-          {assets.map((asset) => (
-            <li key={asset._id} className="mb-2">
-              <span className="font-medium">{asset.name}</span> — {asset.status}
-            </li>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {assignedAssets.map((asset, idx) => (
+            <AssignedAssetCard key={idx} asset={asset} />
           ))}
-        </ul>
+        </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
