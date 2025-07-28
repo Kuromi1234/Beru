@@ -26,8 +26,8 @@ router.get("/getall", verifyToken, allowRoles("admin", "IT"), getAllAssets);
 router.put("/assign", verifyToken, allowRoles("admin", "IT"), assign);
 router.put("/retrieve", verifyToken, allowRoles("admin", "IT"), returnAsset);
 router.put("/update", verifyToken, allowRoles("admin", "IT"), updateAssets);
+router.get("/assigned", verifyToken, allowRoles("admin", "IT"), getAssignedAssetsForCurrentUser);
 router.get("/:id", verifyToken, allowRoles("admin", "IT"), getAssetById);
 router.delete("/delete/:id", verifyToken, allowRoles("admin","IT"), deleteasset);
-router.get("/assigned", verifyToken, allowRoles("admin", "IT"), getAssignedAssetsForCurrentUser);
 
 module.exports = router;
