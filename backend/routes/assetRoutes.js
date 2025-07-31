@@ -14,6 +14,7 @@ const {
   getDashboardStats
 } = require("../controllers/assetController");
 
+const {getAssetHistory} = require("../controllers/assetHistoryController");
 // Middleware
 const { verifyToken } = require("../middleware/verifytoken");
 const { allowRoles } = require("../middleware/checkrole");
@@ -27,6 +28,7 @@ router.put("/assign", verifyToken, allowRoles("admin", "IT"), assign);
 router.put("/retrieve", verifyToken, allowRoles("admin", "IT"), returnAsset);
 router.put("/update", verifyToken, allowRoles("admin", "IT"), updateAssets);
 router.get("/assigned", verifyToken, allowRoles("admin", "IT"), getAssignedAssetsForCurrentUser);
+router.get("/history", verifyToken, allowRoles("admin", "IT"),getAssetHistory );
 router.get("/:id", verifyToken, allowRoles("admin", "IT"), getAssetById);
 router.delete("/delete/:id", verifyToken, allowRoles("admin","IT"), deleteasset);
 
