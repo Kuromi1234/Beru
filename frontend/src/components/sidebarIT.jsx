@@ -13,7 +13,7 @@ const links = [
   { to: "/it/dashboard", icon: <FaTachometerAlt />, label: "Dashboard" },
   { to: "/it/add-asset", icon: <FaPlus />, label: "Add Asset" },
   { to: "/it/assets", icon: <FaLaptop />, label: "View Assets" },
-  { to: "/it/analytics", icon: <FaChartBar />, label: "Analytics" },
+  { to: "/it/history", icon: <FaChartBar />, label: "History" },
   { to: "/it/profile", icon: <FaUserCircle />, label: "Profile" },
 ];
 
