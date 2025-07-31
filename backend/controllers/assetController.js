@@ -1,6 +1,7 @@
 const Asset = require("../models/asset");
 const User = require("../models/user");
 const mongoose = require("mongoose");
+const AssetHistory = require("../models/assetHistory");
 
 // Create a new asset
 exports.createAsset = async (req, res) => {
@@ -79,7 +80,6 @@ exports.getAssetById = async (req, res) => {
   }
 };
 
-// Assign asset to user (by empid)
 exports.assign = async (req, res) => {
   try {
     const { assetID, assetStatus, assignedTo } = req.body;
@@ -96,36 +96,47 @@ exports.assign = async (req, res) => {
       });
     }
 
-    // Find the asset by ID
     const asset = await Asset.findById(assetID);
     if (!asset) {
       return res.status(404).json({ message: "Asset not found" });
     }
 
-    // Prevent re-assignment
     if (asset.status === "assigned") {
       return res.status(400).json({ message: "Asset is already assigned" });
     }
 
     // Assign asset
     asset.assignedTo = {
-      employeeId: assignedTo.empid,
+      empid: assignedTo.empid,
       name: assignedTo.name,
       department: assignedTo.department,
     };
     asset.status = assetStatus || "assigned";
     asset.assignedDate = new Date();
-
-    // Clear any previous retrieval metadata
     asset.retrievedFrom = null;
     asset.toBeRetrievedFrom = null;
     asset.returnDate = null;
 
     await asset.save();
 
+    // Create AssetHistory entry
+    const history = new AssetHistory({
+      asset: asset._id,
+      endUser: {
+        empid: assignedTo.empid,
+        name: assignedTo.name,
+        email: assignedTo.email || "unknown@company.com", // Provide fallback if needed
+      },
+      assignedAt: new Date(),
+      assignedBy: req.user.id,
+    });
+
+    await history.save();
+
     res.status(200).json({
       message: `Asset successfully assigned to ${assignedTo.name} (${assignedTo.empid})`,
       asset,
+      history,
     });
   } catch (err) {
     console.error("Error assigning asset:", err);
@@ -270,8 +281,8 @@ exports.getAssignedAssetsForCurrentUser = async (req, res) => {
     const userId = req.user._id; // From auth middleware
 
     const assets = await Asset.find({
-      assignedTo: userId, 
-      status: { $ne: "in_stock" }, 
+      assignedTo: userId,
+      status: { $ne: "in_stock" },
     }).populate("assignedTo", "name empid email");
 
     res.status(200).json({
