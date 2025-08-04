@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function AddUser() {
   const [formData, setFormData] = useState({
-    empid: "",
+    employeeId: "",
     name: "",
     email: "",
     password: "",
@@ -39,7 +39,7 @@ export default function AddUser() {
 
       toast.success("✅ User added successfully!");
       setFormData({
-        empid: "",
+        employeeId: "",
         name: "",
         email: "",
         password: "",
