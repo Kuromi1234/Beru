@@ -238,6 +238,10 @@ exports.updateAssets = async (req, res) => {
       asset.assignedDate = null;
       asset.toBeRetrievedFrom = null;
     }
+    await AssetHistory.findOneAndUpdate(
+      { asset: asset._id, returnedAt: null },
+      { returnedAt: new Date() }
+    );
 
     if (assetStatus === "to_be_retrieved") {
       asset.toBeRetrievedFrom = asset.assignedTo;
