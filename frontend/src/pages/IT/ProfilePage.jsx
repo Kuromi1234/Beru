@@ -1,51 +1,66 @@
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Float, Sphere, MeshDistortMaterial, Stars } from "@react-three/drei";
-import { motion } from "framer-motion";
+import React, { useContext } from "react";
 import { useAuth } from "../../context/AuthContext";
 
 const ProfilePage = () => {
   const { user } = useAuth();
 
-  return (
-    <div className="relative h-screen w-full overflow-hidden bg-black">
-      {/* 3D Canvas Background */}
-      <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
-        <ambientLight intensity={1.2} />
-        <directionalLight position={[0, 2, 2]} intensity={1} />
-        <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
-        <Float speed={2} rotationIntensity={1} floatIntensity={1.5}>
-          <Sphere args={[1.5, 64, 64]} position={[0, 0, 0]}>
-            <MeshDistortMaterial
-              color="#00FFFF"
-              attach="material"
-              distort={0.4}
-              speed={2}
-              roughness={0.1}
-            />
-          </Sphere>
-        </Float>
-        <OrbitControls enableZoom={false} />
-      </Canvas>
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white text-xl">
+        Loading your profile...
+      </div>
+    );
+  }
 
-      {/* Floating Profile Card */}
-      <motion.div
-        className="absolute inset-0 z-10 flex items-center justify-center px-4"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-      >
-        <div className="backdrop-blur-md bg-white/10 text-white rounded-2xl p-6 w-full max-w-md border border-white/20 shadow-2xl">
-          <h2 className="text-2xl font-bold mb-4 text-cyan-400">👤 Your Profile</h2>
-          <div className="space-y-2 text-sm sm:text-base leading-relaxed">
-            <p><span className="font-semibold text-cyan-300">Name:</span> {user?.name || "N/A"}</p>
-            <p><span className="font-semibold text-cyan-300">Employee ID:</span> {user?.empId || "N/A"}</p>
-            <p><span className="font-semibold text-cyan-300">Email:</span> {user?.email || "N/A"}</p>
-            <p><span className="font-semibold text-cyan-300">Role:</span> {user?.role || "N/A"}</p>
-            <p><span className="font-semibold text-cyan-300">Department:</span> {user?.department || "N/A"}</p>
+  return (
+  
+     <div className="bg-white/5 border border-white/10 backdrop-blur-lg rounded-3xl shadow-[0_20px_60px_rgba(128,90,213,0.3)] p-6 sm:p-10 w-[90%] max-w-md mx-auto mt-10 sm:mt-20 relative overflow-hidden transition-all duration-500">
+
+        
+        {/* Subtle Background Glow */}
+        <div className="absolute -top-20 -right-20 w-72 h-72 bg-purple-500 opacity-30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-indigo-500 opacity-30 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Avatar */}
+        <div className="flex justify-center mb-6">
+          <img
+            src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
+            alt="User Avatar"
+            className="w-24 h-24 rounded-full border-4 border-purple-500/60 shadow-lg"
+          />
+        </div>
+
+        {/* User Info */}
+        <div className="text-center text-white space-y-2">
+          <h1 className="text-3xl font-semibold tracking-tight text-purple-300">{user.name}</h1>
+          <p className="text-sm text-indigo-300">{user.email}</p>
+          <p className="text-xs text-indigo-400 tracking-wide">{user.employeeId}</p>
+        </div>
+
+        {/* Divider */}
+        <div className="my-6 border-t border-white/10" />
+
+        {/* Meta Info */}
+        <div className="space-y-2 text-sm text-white text-center">
+          <div>
+            <span className="text-purple-400 font-medium">Role:</span>{" "}
+            <span className="text-indigo-200">{user.role}</span>
+          </div>
+          <div>
+            <span className="text-purple-400 font-medium">Department:</span>{" "}
+            <span className="text-indigo-200">{user.department || "IT"}</span>
+          </div>
+          <div>
+            <span className="text-purple-400 font-medium">Employee ID:</span>{" "}
+            <span className="text-indigo-200">{user.employeeId || "N/A"}</span>
+          </div>
+          <div>
+            <span className="text-purple-400 font-medium">Designation:</span>{" "}
+            <span className="text-indigo-200">{user.designation || "Systems Engineer"}</span>
           </div>
         </div>
-      </motion.div>
-    </div>
+      </div>
+
   );
 };
 
