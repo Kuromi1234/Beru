@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 
 export default function Register() {
   const [formData, setFormData] = useState({
-    empid: "",
+    employeeId: "",
     name: "",
     email: "",
     password: "",
@@ -95,8 +95,8 @@ export default function Register() {
             <label className="block mb-1 font-medium">Employee ID</label>
             <input
               type="text"
-              name="empid"
-              value={formData.empid}
+              name="employeeId"
+              value={formData.employeeId}
               onChange={handleChange}
               placeholder="01010101"
               className="w-full px-4 py-2 rounded-xl bg-black/30 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-purple-400"
