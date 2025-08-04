@@ -29,19 +29,29 @@ export default function HistoryPage() {
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearch(value);
-    const filteredData = history.filter((entry) =>
-      entry.asset?.serialNumber?.toLowerCase().includes(value) ||
-      entry.asset?.model?.toLowerCase().includes(value) ||
-      entry.asset?.assetType?.toLowerCase().includes(value) ||
-      entry.endUser?.name?.toLowerCase().includes(value) ||
-      entry.endUser?.empid?.toLowerCase().includes(value)
+    const filteredData = history.filter(
+      (entry) =>
+        entry.asset?.serialNumber?.toLowerCase().includes(value) ||
+        entry.asset?.model?.toLowerCase().includes(value) ||
+        entry.asset?.assetType?.toLowerCase().includes(value) ||
+        entry.endUser?.name?.toLowerCase().includes(value) ||
+        entry.endUser?.empid?.toLowerCase().includes(value)
     );
     setFiltered(filteredData);
   };
 
   const exportToCSV = () => {
     const csv = [
-      ["Serial Number", "Model", "Type", "Emp ID", "Name", "Email", "Action", "Date"],
+      [
+        "Serial Number",
+        "Model",
+        "Type",
+        "Emp ID",
+        "Name",
+        "Email",
+        "Action",
+        "Date",
+      ],
       ...filtered.map((h) => [
         h.asset?.serialNumber || "",
         h.asset?.model || "",
@@ -49,8 +59,10 @@ export default function HistoryPage() {
         h.endUser?.empid || "",
         h.endUser?.name || "",
         h.endUser?.email || "",
-        h.action,
-        new Date(h.date).toLocaleString(),
+        h.returnedAt ? "returned" : "assigned",
+        h.returnedAt
+          ? new Date(h.returnedAt).toLocaleString()
+          : new Date(h.assignedAt).toLocaleString(),
       ]),
     ]
       .map((row) => row.join(","))
@@ -65,8 +77,9 @@ export default function HistoryPage() {
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-10">
+      {/* Header */}
       <motion.div
-        className="flex justify-between items-center mb-6"
+        className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -80,6 +93,7 @@ export default function HistoryPage() {
         </button>
       </motion.div>
 
+      {/* Search */}
       <div className="mb-6 flex justify-end">
         <div className="relative w-full max-w-md">
           <input
@@ -93,10 +107,11 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl shadow-lg bg-white/10 backdrop-blur p-4 border border-white/10">
-        <table className="w-full text-left table-auto text-white text-sm">
+      {/* Table */}
+      <div className="overflow-x-auto rounded-xl shadow-xl bg-white/5 backdrop-blur border border-white/10">
+        <table className="min-w-full text-sm text-white table-auto">
           <thead>
-            <tr className="text-purple-300 border-b border-white/10">
+            <tr className="text-purple-300 border-b border-white/10 text-left">
               <th className="py-3 px-4">Serial</th>
               <th className="py-3 px-4">Model</th>
               <th className="py-3 px-4">Type</th>
@@ -113,17 +128,25 @@ export default function HistoryPage() {
                 key={entry._id}
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
+                transition={{ delay: i * 0.02 }}
                 className="hover:bg-white/5 border-b border-white/10"
               >
                 <td className="py-3 px-4">{entry.asset?.serialNumber}</td>
                 <td className="py-3 px-4">{entry.asset?.model}</td>
-                <td className="py-3 px-4 capitalize">{entry.asset?.assetType}</td>
+                <td className="py-3 px-4 capitalize">
+                  {entry.asset?.assetType}
+                </td>
                 <td className="py-3 px-4">{entry.endUser?.empid}</td>
                 <td className="py-3 px-4">{entry.endUser?.name}</td>
                 <td className="py-3 px-4">{entry.endUser?.email}</td>
-                <td className="py-3 px-4 capitalize text-purple-300">{entry.action}</td>
-                <td className="py-3 px-4">{new Date(entry.date).toLocaleString()}</td>
+                <td className="py-3 px-4 capitalize text-purple-300">
+                  {entry.returnedAt ? "returned" : "assigned"}
+                </td>
+                <td className="py-3 px-4">
+                  {entry.returnedAt
+                    ? new Date(entry.returnedAt).toLocaleString()
+                    : new Date(entry.assignedAt).toLocaleString()}
+                </td>
               </motion.tr>
             ))}
           </tbody>
