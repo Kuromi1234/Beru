@@ -6,14 +6,14 @@ export default function AssignAssetModal({ asset, onClose, onAssign }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    empid: "",
+    employeeId: "",
     department: "",
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onAssign(asset._id, form);
-  };
+ const handleSubmit = (e) => {
+  e.preventDefault();
+  onAssign(asset._id, form); 
+};
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50">
@@ -66,8 +66,8 @@ export default function AssignAssetModal({ asset, onClose, onAssign }) {
               required
               type="text"
               placeholder="Enter employee ID"
-              value={form.empid}
-              onChange={(e) => setForm({ ...form, empid: e.target.value })}
+              value={form.employeeId}
+              onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
               className="w-full px-4 py-2 rounded bg-white/20 text-white placeholder-white/60 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
