@@ -35,7 +35,7 @@ export default function HistoryPage() {
         entry.asset?.model?.toLowerCase().includes(value) ||
         entry.asset?.assetType?.toLowerCase().includes(value) ||
         entry.endUser?.name?.toLowerCase().includes(value) ||
-        entry.endUser?.empid?.toLowerCase().includes(value)
+        entry.endUser?.employeeId?.toLowerCase().includes(value)
     );
     setFiltered(filteredData);
   };
@@ -56,7 +56,7 @@ export default function HistoryPage() {
         h.asset?.serialNumber || "",
         h.asset?.model || "",
         h.asset?.assetType || "",
-        h.endUser?.empid || "",
+        h.endUser?.employeeId || "",
         h.endUser?.name || "",
         h.endUser?.email || "",
         h.returnedAt ? "returned" : "assigned",
@@ -136,7 +136,7 @@ export default function HistoryPage() {
                 <td className="py-3 px-4 capitalize">
                   {entry.asset?.assetType}
                 </td>
-                <td className="py-3 px-4">{entry.endUser?.empid}</td>
+                <td className="py-3 px-4">{entry.endUser?.employeeId}</td>
                 <td className="py-3 px-4">{entry.endUser?.name}</td>
                 <td className="py-3 px-4">{entry.endUser?.email}</td>
                 <td className="py-3 px-4 capitalize text-purple-300">
