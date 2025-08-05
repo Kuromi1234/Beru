@@ -6,7 +6,7 @@ const AssetHistory = require("../models/assetHistory");
 // Create a new asset
 exports.createAsset = async (req, res) => {
   try {
-    const { name, serialNumber, description, model, assetType, status, empid } =
+    const { name, serialNumber, description, model, assetType, status, employeeId } =
       req.body;
 
     const existing = await Asset.findOne({ serialNumber });
@@ -25,14 +25,14 @@ exports.createAsset = async (req, res) => {
     });
 
     // If being assigned directly
-    if (status === "assigned" && empid) {
-      const user = await User.findOne({ empid });
+    if (status === "assigned" && empployeeId) {
+      const user = await User.findOne({ employeeId });
       if (!user) {
         return res
           .status(404)
           .json({ message: "User with given empid not found" });
       }
-      newAsset.assignedTo = user._id;
+      newAsset.assignedTo = user.employeeId;
       newAsset.status = "assigned";
       newAsset.assignedDate = new Date();
     } else {
@@ -86,13 +86,13 @@ exports.assign = async (req, res) => {
 
     if (
       !assetID ||
-      !assignedTo?.empid ||
+      !assignedTo?.employeeId ||
       !assignedTo?.name ||
       !assignedTo?.department
     ) {
       return res.status(400).json({
         message:
-          "All fields are required: assetID, assignedTo.empid, name, department",
+          "All fields are required: assetID, assignedTo, name, department",
       });
     }
 
@@ -107,7 +107,7 @@ exports.assign = async (req, res) => {
 
     // Assign asset
     asset.assignedTo = {
-      empid: assignedTo.empid,
+      employeeId: assignedTo.employeeId,
       name: assignedTo.name,
       department: assignedTo.department,
     };
@@ -123,7 +123,7 @@ exports.assign = async (req, res) => {
     const history = new AssetHistory({
       asset: asset._id,
       endUser: {
-        empid: assignedTo.empid,
+        employeeId: assignedTo.employeeId,
         name: assignedTo.name,
         email: assignedTo.email || "unknown@company.com", // Provide fallback if needed
       },
@@ -134,7 +134,7 @@ exports.assign = async (req, res) => {
     await history.save();
 
     res.status(200).json({
-      message: `Asset successfully assigned to ${assignedTo.name} (${assignedTo.empid})`,
+      message: `Asset successfully assigned to ${assignedTo.name} (${assignedTo.employeeId})`,
       asset,
       history,
     });
