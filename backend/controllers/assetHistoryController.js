@@ -3,12 +3,12 @@ const assetHistory = require("../models/assetHistory");
 
 exports.getAssetHistory = async (req, res) => {
   try {
-    const { empid, serialNumber, fromDate, toDate } = req.query;
+    const { employeeId, serialNumber, fromDate, toDate } = req.query;
 
     let filter = {};
 
-    if (empid) {
-      filter["endUser.empid"] = empid;
+    if (employeeId) {
+      filter["endUser.employeeId"] = employeeId;
     }
 
     if (serialNumber) {
