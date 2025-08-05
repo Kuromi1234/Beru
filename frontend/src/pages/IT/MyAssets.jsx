@@ -242,15 +242,21 @@ export default function MyAssets() {
 
   const handleAssign = async (assetId, userDetails) => {
     try {
-      await axios.put(
-        `${API_BASE_URL}/assign`,
-        {
-          assetID: assetId,
-          assetStatus: "assigned",
-          assignedTo: userDetails,
+      const payload = {
+        assetID: assetId,
+        assetStatus: "assigned",
+        assignedTo: {
+          employeeId: userDetails.employeeId || userDetails.employeeId,
+          name: userDetails.name,
+          email: userDetails.email,
+          department: userDetails.department,
         },
-        getAuthHeaders()
-      );
+      };
+
+      console.log("📦 Payload to assign:", payload);
+
+      await axios.put(`${API_BASE_URL}/assign`, payload, getAuthHeaders());
+
       await fetchAssets();
       toast.success("✅ Asset assigned successfully");
       setShowAssignModal(false);
