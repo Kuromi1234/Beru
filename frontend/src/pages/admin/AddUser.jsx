@@ -71,8 +71,8 @@ export default function AddUser() {
           <label className="block text-sm mb-1">Employee ID</label>
           <input
             type="text"
-            name="empid"
-            value={formData.empid}
+            name="employeeId"
+            value={formData.employeeId}
             onChange={handleChange}
             required
             placeholder="EMP001"
