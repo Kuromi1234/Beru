@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 // Registration
 exports.register = async (req, res) => {
   try {
-    const { empid, name, email, password, department } = req.body;
+    const { employeeId, name, email, password, department } = req.body;
     if (department !== "IT") {
       return res
         .status(403)
@@ -20,7 +20,7 @@ exports.register = async (req, res) => {
     const role = email === "arjunnathhh@gmail.com" ? "admin" : "IT";
 
     const newUser = new User({
-      empid,
+      employeeId,
       name,
       email,
       password: hashedPassword,
