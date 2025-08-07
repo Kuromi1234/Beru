@@ -21,7 +21,9 @@ exports.verifyToken = async (req, res, next) => {
     // Attach user info to request object
     req.user = {
       id: decoded.id,
-      role: decoded.role
+      role: decoded.role,
+      employeeId: decoded.employeeId,
+      name: decoded.name,
     };
     
     next();
