@@ -57,7 +57,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid username or password" });
 
     const token = jwt.sign(
-      { id: foundUser._id, role: foundUser.role },
+      { id: foundUser._id, role: foundUser.role  , employeeId: foundUser.employeeId, name: foundUser.name  ,department: foundUser.department },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -70,6 +70,8 @@ exports.login = async (req, res) => {
         name: foundUser.name,
         email: foundUser.email,
         role: foundUser.role,
+        employeeId: foundUser.employeeId,
+        department: foundUser.department,
       },
     });
   } catch (err) {
