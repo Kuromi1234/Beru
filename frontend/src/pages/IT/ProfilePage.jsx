@@ -1,66 +1,65 @@
-import React, { useContext } from "react";
+import React from "react";
 import { useAuth } from "../../context/AuthContext";
+import { motion } from "framer-motion";
 
 const ProfilePage = () => {
   const { user } = useAuth();
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-white text-xl">
-        Loading your profile...
+      <div className="text-white text-lg text-center mt-10">
+        Loading Profile...
       </div>
     );
   }
 
+  const [firstName, lastName] = user.name.split(" ");
+
   return (
-  
-     <div className="bg-white/5 border border-white/10 backdrop-blur-lg rounded-3xl shadow-[0_20px_60px_rgba(128,90,213,0.3)] p-6 sm:p-10 w-[90%] max-w-md mx-auto mt-10 sm:mt-20 relative overflow-hidden transition-all duration-500">
-
-        
-        {/* Subtle Background Glow */}
-        <div className="absolute -top-20 -right-20 w-72 h-72 bg-purple-500 opacity-30 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-indigo-500 opacity-30 rounded-full blur-3xl pointer-events-none" />
-
+    <div className=" w-full flex items-center justify-center  px-4 py-10 ">
+      <motion.div
+        initial={{ opacity: 0, y: 50, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", stiffness: 90, damping: 12 }}
+        className="relative max-w-4xl w-full p-8 md:p-12 "
+      >
         {/* Avatar */}
-        <div className="flex justify-center mb-6">
-          <img
+        <div className="flex flex-col items-center gap-4">
+          <motion.img
             src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
             alt="User Avatar"
-            className="w-24 h-24 rounded-full border-4 border-purple-500/60 shadow-lg"
+            className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-indigo-500 shadow-md hover:scale-105 transition-all duration-300"
+            whileHover={{ scale: 1.05 }}
           />
-        </div>
 
-        {/* User Info */}
-        <div className="text-center text-white space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight text-purple-300">{user.name}</h1>
-          <p className="text-sm text-indigo-300">{user.email}</p>
-          <p className="text-xs text-indigo-400 tracking-wide">{user.employeeId}</p>
+          <div className="text-center">
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-1">
+              {firstName?.toUpperCase()} {lastName?.toUpperCase()}
+            </h2>
+            <p className="text-indigo-300 text-sm">{user.email}</p>
+          </div>
         </div>
 
         {/* Divider */}
-        <div className="my-6 border-t border-white/10" />
+        <div className="my-8 border-t border-white/10" />
 
-        {/* Meta Info */}
-        <div className="space-y-2 text-sm text-white text-center">
-          <div>
-            <span className="text-purple-400 font-medium">Role:</span>{" "}
-            <span className="text-indigo-200">{user.role}</span>
+        {/* Profile Info */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm text-center">
+          <div className="bg-white/5 p-4 rounded-xl shadow-inner border border-white/10 hover:shadow-lg transition">
+            <span className="text-purple-400 font-semibold block mb-1">EmpID</span>
+            <span className="text-indigo-100">{user?.employeeId}</span>
           </div>
-          <div>
-            <span className="text-purple-400 font-medium">Department:</span>{" "}
-            <span className="text-indigo-200">{user.department || "IT"}</span>
+          <div className="bg-white/5 p-4 rounded-xl shadow-inner border border-white/10 hover:shadow-lg transition">
+            <span className="text-purple-400 font-semibold block mb-1">Department</span>
+            <span className="text-indigo-100">{user.department}</span>
           </div>
-          <div>
-            <span className="text-purple-400 font-medium">Employee ID:</span>{" "}
-            <span className="text-indigo-200">{user.employeeId || "N/A"}</span>
-          </div>
-          <div>
-            <span className="text-purple-400 font-medium">Designation:</span>{" "}
-            <span className="text-indigo-200">{user.designation || "Systems Engineer"}</span>
+          <div className="bg-white/5 p-4 rounded-xl shadow-inner border border-white/10 hover:shadow-lg transition">
+            <span className="text-purple-400 font-semibold block mb-1">Designation</span>
+            <span className="text-indigo-100">{user.designation || "Systems Engineer"}</span>
           </div>
         </div>
-      </div>
-
+      </motion.div>
+    </div>
   );
 };
 
