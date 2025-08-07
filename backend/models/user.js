@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    employeeId: { // previously empid
+    employeeId: { 
+      
       type: String,
       required: true,
       unique: true,
