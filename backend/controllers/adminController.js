@@ -15,7 +15,7 @@ exports.adminResetUserPassword = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { password: hashedPassword },
-      { new: true, runValidators: false } // 👈 disable full document validation
+      { new: true, runValidators: false } 
     );
 
     if (!updatedUser)
