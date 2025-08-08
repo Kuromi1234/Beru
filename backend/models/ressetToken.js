@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const resetTokenSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user", // model name should match the actual export in user.model.js (case-sensitive)
+    ref: "user", 
     required: true,
     unique: true,
   },
