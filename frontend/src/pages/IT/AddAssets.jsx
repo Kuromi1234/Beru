@@ -4,7 +4,7 @@ import { FaPlusCircle } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { FaChevronDown } from "react-icons/fa";
-import CustomStatusDropdown from "../../components/CustomStatusDropdown";
+
 
 const API_BASE_URL = "http://localhost:5000/api/assets";
 
@@ -60,7 +60,7 @@ const AddAssetPage = () => {
 
   return (
     <motion.div
-      className="min-h-screen flex items-center justify-center "
+      className=" flex items-center justify-center "
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
