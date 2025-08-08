@@ -12,7 +12,6 @@ const Hero = () => {
       <div className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-purple-600/30 rounded-full blur-3xl animate-pulse z-0" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-pink-500/20 rounded-full blur-2xl animate-pulse z-0" />
 
-      {/* 🔥 Spline Embed - Blended with Background */}
       <div className="absolute inset-0 w-full h-full z-0 opacity-30 pointer-events-none">
         <iframe
           src="https://my.spline.design/squarechipsfallinginplace-7Sra50icmIA1Q6Q6n0Dy4RKC/"
