@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api/assets", assetRoutes);
-app.use("/api/psswd",passwordRoutes);
+app.use("/api/passwd",passwordRoutes);
 app.use("/api/admin",adminRoutes);
 
 //err handler
