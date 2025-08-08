@@ -2,27 +2,28 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 
+// Section links for in-page scroll
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "About", path: "#about" },
-  { name: "Origin", path: "#Origin" },
-  { name: "Developer", path: "#Developer" },
-  { name: "Contact", path: "#Contact" },
+  { name: "Origin", path: "#origin" },
+  { name: "Developer", path: "#developer" },
+  { name: "Contact", path: "#contact" },
 ];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-[999] bg-black/30 backdrop-blur-md shadow-md border-b border-white/10">
+    <header className="fixed top-0 left-0 w-full z-[999] bg-black/30 backdrop-blur-md shadow-md border-b border-white/10 scroll-smooth">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Brand */}
-        <Link
-          to="/"
+        <a
+          href="#home"
           className="text-white text-2xl font-extrabold tracking-widest"
         >
           BERU
-        </Link>
+        </a>
 
         {/* Desktop Nav */}
         <ul className="hidden md:flex gap-8 text-white font-medium items-center">
@@ -36,6 +37,8 @@ const Navbar = () => {
               <a href={path}>{name}</a>
             </motion.li>
           ))}
+
+          {/* Login */}
           <motion.li
             whileHover={{ scale: 1.08, y: -2, color: "#C084FC" }}
             transition={{ type: "spring", stiffness: 200, damping: 12 }}
@@ -47,7 +50,10 @@ const Navbar = () => {
               Login
             </Link>
           </motion.li>
+
           <p>/</p>
+
+          {/* Signup */}
           <motion.li
             whileHover={{ scale: 1.08, y: -2, color: "#C084FC" }}
             transition={{ type: "spring", stiffness: 200, damping: 12 }}
@@ -94,14 +100,14 @@ const Navbar = () => {
             className="md:hidden absolute top-16 left-0 w-full bg-black/90 backdrop-blur-lg px-8 py-6 flex flex-col gap-4"
           >
             {navLinks.map(({ name, path }, i) => (
-              <Link
+              <a
                 key={i}
-                to={path}
+                href={path}
                 onClick={() => setIsOpen(false)}
                 className="text-white text-lg font-semibold hover:text-purple-400 transition"
               >
                 {name}
-              </Link>
+              </a>
             ))}
 
             <Link
