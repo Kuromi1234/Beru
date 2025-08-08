@@ -3,9 +3,9 @@ import { Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Register from "./pages/register";
 import Login from "./pages/Login";
-import ForgotPassword from "./pages/forgotPassword";
-import Verifyotp from "./pages/VerifyOTP";
-import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import Verifyotp from "./pages/Auth/VerifyOTP";
+import ResetPassword from "./pages/Auth/ResetPassword";
 
 import AdminLayout from "./pages/admin/AdminLayoutTemp";
 import Dashboard from "./pages/admin/Dashboard";
