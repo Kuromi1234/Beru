@@ -1,9 +1,9 @@
 const Asset = require("../models/asset");
-const assetHistory = require("../models/assetHistory");
+const AssetHistory = require("../models/assetHistory");
 
 exports.getAssetHistory = async (req, res) => {
   try {
-    const { employeeId, serialNumber, fromDate, toDate } = req.query;
+    const { employeeId, serialNumber, fromDate, toDate, page = 1, limit = 10 } = req.query;
 
     let filter = {};
 
@@ -21,17 +21,30 @@ exports.getAssetHistory = async (req, res) => {
     }
 
     if (fromDate || toDate) {
-      filter.date = {};
-      if (fromDate) filter.date.$gte = new Date(fromDate);
-      if (toDate) filter.date.$lte = new Date(toDate);
+      filter.createdAt = {};
+      if (fromDate) filter.createdAt.$gte = new Date(fromDate);
+      if (toDate) filter.createdAt.$lte = new Date(toDate);
     }
 
-    const history = await assetHistory.find(filter)
+    // Pagination
+    const pageNumber = parseInt(page);
+    const pageLimit = parseInt(limit);
+    const skip = (pageNumber - 1) * pageLimit;
+
+    const totalCount = await AssetHistory.countDocuments(filter);
+
+    const history = await AssetHistory.find(filter)
       .populate("asset", "serialNumber model assetType")
-      .populate("assignedBy", "name email");
+      .populate("assignedBy", "name email")
+      .sort({ createdAt: -1 }) // newest first, change to 1 if you want oldest first
+      .skip(skip)
+      .limit(pageLimit);
 
     res.status(200).json({
       success: true,
+      totalCount,
+      page: pageNumber,
+      totalPages: Math.ceil(totalCount / pageLimit),
       history,
     });
   } catch (err) {
