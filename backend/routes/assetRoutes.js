@@ -25,7 +25,6 @@ router.post("/add", verifyToken, allowRoles("admin", "IT"), createAsset);
 router.get("/stats", verifyToken, allowRoles("admin", "IT"), getDashboardStats);
 router.get("/getall", verifyToken, allowRoles("admin", "IT"), getAllAssets);
 router.put("/assign", verifyToken, allowRoles("admin", "IT"), assign);
-router.put("/retrieve", verifyToken, allowRoles("admin", "IT"), returnAsset);
 router.put("/update", verifyToken, allowRoles("admin", "IT"), updateAssets);
 router.get("/assigned", verifyToken, allowRoles("admin", "IT"), getAssignedAssetsForCurrentUser);
 router.get("/history", verifyToken, allowRoles("admin", "IT"),getAssetHistory );
