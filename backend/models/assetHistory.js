@@ -7,17 +7,17 @@ const assetHistorySchema = new mongoose.Schema(
     asset: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Asset",
-      required: true,
+      required: false,
     },
     endUser: {
-      name: { type: String, required: true },
-      email: { type: String, required: true },
-      employeeId: { type: String, required: true },
+      name: { type: String, required: false},
+      email: { type: String, required: false },
+      employeeId: { type: String, required: false},
     },
     assignedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user", // This is the system user (admin/staff) who is assigning
-      required: true,
+      required: false,
     },
     assignedAt: {
       type: Date,
