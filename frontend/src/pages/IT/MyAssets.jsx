@@ -246,7 +246,7 @@ export default function MyAssets() {
         assetID: assetId,
         assetStatus: "assigned",
         assignedTo: {
-          employeeId: userDetails.employeeId || userDetails.employeeId,
+          employeeId: userDetails.employeeId ,
           name: userDetails.name,
           email: userDetails.email,
           department: userDetails.department,
