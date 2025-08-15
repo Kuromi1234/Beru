@@ -6,8 +6,15 @@ const AssetHistory = require("../models/assetHistory");
 // Create a new asset
 exports.createAsset = async (req, res) => {
   try {
-    const { name, serialNumber, description, model, assetType, status, employeeId } =
-      req.body;
+    const {
+      name,
+      serialNumber,
+      description,
+      model,
+      assetType,
+      status,
+      employeeId,
+    } = req.body;
 
     const existing = await Asset.findOne({ serialNumber });
     if (existing) {
@@ -146,44 +153,10 @@ exports.assign = async (req, res) => {
     });
   }
 };
-
-// Retrieve asset from user (by empid)
-exports.returnAsset = async (req, res) => {
-  try {
-    const { assetId, empid } = req.body;
-
-    const asset = await Asset.findById(assetId);
-    const user = await User.findOne({ empid });
-
-    if (!asset || !user) {
-      return res.status(404).json({ message: "Asset or User not found!" });
-    }
-
-    if (!asset.assignedTo) {
-      return res.status(400).json({ message: "Asset is not assigned" });
-    }
-
-    asset.status = "retrieved";
-    asset.assignedTo = null;
-    asset.returnDate = new Date();
-
-    await asset.save();
-
-    res.status(200).json({
-      message: `Asset retrieved from ${user.name} and marked as retrieved.`,
-      asset,
-    });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error processing return", error: err.message });
-  }
-};
-
 // Update asset lifecycle status (unified endpoint)
 exports.updateAssets = async (req, res) => {
   try {
-    const { assetID, assetStatus } = req.body;
+    const { assetID, assetStatus, assignedTo } = req.body;
 
     if (!assetID || !assetStatus) {
       return res.status(400).json({
@@ -217,13 +190,20 @@ exports.updateAssets = async (req, res) => {
     // Update asset status
     asset.status = assetStatus;
 
+    if (assetStatus === "assigned") {
+      if (!assignedTo) {
+        return res.status(400).json({ message: "Assigned user is required" });
+      }
+      asset.assignedTo = assignedTo;
+      asset.assignedDate = new Date();
+    }
+
     if (
       assetStatus === "in_stock" ||
       assetStatus === "damaged" ||
       assetStatus === "repair" ||
       assetStatus === "discarded"
     ) {
-      // Clear user-assignment fields
       asset.assignedTo = null;
       asset.assignedDate = null;
       asset.toBeRetrievedFrom = null;
@@ -238,16 +218,26 @@ exports.updateAssets = async (req, res) => {
       asset.assignedDate = null;
       asset.toBeRetrievedFrom = null;
     }
-    await AssetHistory.findOneAndUpdate(
-      { asset: asset._id, returnedAt: null },
-      { returnedAt: new Date() }
-    );
 
     if (assetStatus === "to_be_retrieved") {
       asset.toBeRetrievedFrom = asset.assignedTo;
     }
 
+    // Save asset changes first
     await asset.save();
+
+    // Create history entry
+    await AssetHistory.create({
+      asset: asset._id,
+      performedBy: req.user._id,
+      endUser: {
+        employeeId: assignedTo.employeeId,
+        name: assignedTo.name,
+        email: assignedTo.email || "unknown@company.com", 
+      },
+      action: assetStatus,
+      assignedTo: asset.assignedTo || null,
+    });
 
     res.status(200).json({
       message: `Asset status updated to '${assetStatus}'`,
