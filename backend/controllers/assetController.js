@@ -230,11 +230,6 @@ exports.updateAssets = async (req, res) => {
     await AssetHistory.create({
       asset: asset._id,
       performedBy: req.user._id,
-      endUser: {
-        employeeId: assignedTo.employeeId,
-        name: assignedTo.name,
-        email: assignedTo.email || "unknown@company.com", 
-      },
       action: assetStatus,
       assignedTo: asset.assignedTo || null,
     });
