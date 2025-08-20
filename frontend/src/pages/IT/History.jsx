@@ -188,7 +188,8 @@ export default function HistoryPage() {
                 <th className="py-3 px-4 border-b border-purple-600 text-left">Model</th>
                 <th className="py-3 px-4 border-b border-purple-600 text-left">Type</th>
                 <th className="py-3 px-4 border-b border-purple-600 text-left">Action</th>
-                <th className="py-3 px-4 border-b border-purple-600 text-left">End User</th>
+                <th className="py-3 px-4 border-b border-purple-600 text-left">User Name</th>
+                <th className="py-3 px-4 border-b border-purple-600 text-left">User EmpId</th>
                 <th className="py-3 px-4 border-b border-purple-600 text-left">Performed BY</th>
                 <th className="py-3 px-4 border-b border-purple-600 text-left">Date</th>
               </tr>
@@ -204,7 +205,8 @@ export default function HistoryPage() {
                   <td className="py-2 px-4 capitalize">{item.asset?.assetType || "N/A"}</td>
                   <td className="py-2 px-4 capitalize">{item.action}</td>
                   <td className="py-2 px-4">{item.endUser?.name || "N/A"}</td>
-                  <td className="py-2 px-4">{item.performedBY || "N/A"}</td>
+                  <td className="py-2 px-4">{item.endUser?.employeeId || "N/A"}</td>
+                  <td className="py-2 px-4">{item.assignedBy?.name || "N/A"}</td>
 
                   <td className="py-2 px-4">{new Date(item.createdAt).toLocaleString()}</td>
                 </tr>
