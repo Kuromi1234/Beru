@@ -136,6 +136,7 @@ exports.assign = async (req, res) => {
       },
       assignedAt: new Date(),
       assignedBy: req.user.id,
+      action: "assigned",
     });
 
     await history.save();
@@ -159,9 +160,7 @@ exports.updateAssets = async (req, res) => {
     const { assetID, assetStatus, assignedTo } = req.body;
 
     if (!assetID || !assetStatus) {
-      return res.status(400).json({
-        message: "Asset ID and status are required",
-      });
+      return res.status(400).json({ message: "Asset ID and status are required" });
     }
 
     const allowedStatuses = [
@@ -175,19 +174,15 @@ exports.updateAssets = async (req, res) => {
     ];
 
     if (!allowedStatuses.includes(assetStatus)) {
-      return res.status(400).json({
-        message: "Invalid asset status provided",
-      });
+      return res.status(400).json({ message: "Invalid asset status provided" });
     }
 
     const asset = await Asset.findById(assetID);
     if (!asset) {
-      return res.status(404).json({
-        message: "Asset not found!",
-      });
+      return res.status(404).json({ message: "Asset not found!" });
     }
 
-    // Update asset status
+    // === Update asset ===
     asset.status = assetStatus;
 
     if (assetStatus === "assigned") {
@@ -198,12 +193,7 @@ exports.updateAssets = async (req, res) => {
       asset.assignedDate = new Date();
     }
 
-    if (
-      assetStatus === "in_stock" ||
-      assetStatus === "damaged" ||
-      assetStatus === "repair" ||
-      assetStatus === "discarded"
-    ) {
+    if (["in_stock", "damaged", "repair", "discarded"].includes(assetStatus)) {
       asset.assignedTo = null;
       asset.assignedDate = null;
       asset.toBeRetrievedFrom = null;
@@ -223,15 +213,32 @@ exports.updateAssets = async (req, res) => {
       asset.toBeRetrievedFrom = asset.assignedTo;
     }
 
-    // Save asset changes first
     await asset.save();
 
-    // Create history entry
+    // === Prepare history fields ===
+    let endUserDetails = { name: "N/A", email: "N/A", employeeId: "N/A" };
+
+    if (assetStatus === "retrieved" && asset.retrievedFrom) {
+      endUserDetails = {
+        employeeId: asset.retrievedFrom.employeeId,
+        name: asset.retrievedFrom.name,
+        email: asset.retrievedFrom.email,
+      };
+    } else if (assetStatus === "to_be_retrieved" && asset.toBeRetrievedFrom) {
+      endUserDetails = {
+        employeeId: asset.toBeRetrievedFrom.employeeId,
+        name: asset.toBeRetrievedFrom.name,
+        email: asset.toBeRetrievedFrom.email,
+      };
+    }
+
+    // === Create history entry ===
     await AssetHistory.create({
       asset: asset._id,
-      performedBy: req.user._id,
+      assignedBy: req.user._id,  // the admin/staff
       action: assetStatus,
       assignedTo: asset.assignedTo || null,
+      endUser: endUserDetails,
     });
 
     res.status(200).json({
