@@ -19,6 +19,11 @@ const assetHistorySchema = new mongoose.Schema(
       ref: "user", // This is the system user (admin/staff) who is assigning
       required: false,
     },
+    action: {
+      type: String,
+      enum: ["in_stock", "assigned", "retrieved", "to_be_retrieved", "damaged", "repair", "discarded"],
+      required: true,
+    },
     assignedAt: {
       type: Date,
       default: Date.now,
