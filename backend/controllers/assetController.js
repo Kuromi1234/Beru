@@ -235,7 +235,7 @@ exports.updateAssets = async (req, res) => {
     // === Create history entry ===
     await AssetHistory.create({
       asset: asset._id,
-      assignedBy: req.user._id,  // the admin/staff
+      assignedBy: req.user.id,  // the admin/staff
       action: assetStatus,
       assignedTo: asset.assignedTo || null,
       endUser: endUserDetails,
