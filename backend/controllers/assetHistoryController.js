@@ -36,7 +36,7 @@ exports.getAssetHistory = async (req, res) => {
     const history = await AssetHistory.find(filter)
       .populate("asset", "serialNumber model assetType")
       .populate("assignedBy", "name email")
-      .sort({ createdAt: -1 }) // newest first, change to 1 if you want oldest first
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(pageLimit);
 
