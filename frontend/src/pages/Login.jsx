@@ -43,7 +43,7 @@ const Login = () => {
   };
 
   return (
-    <section className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-darkNavy via-secondary to-black text-white">
+    <section className="min-h-screen flex flex-col md:flex-row  text-white">
       {/* LEFT VISUAL */}
       <div className="md:w-1/2 w-full flex items-center justify-center p-10 relative overflow-hidden">
         <motion.div
