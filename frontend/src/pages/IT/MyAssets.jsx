@@ -3,6 +3,14 @@ import AssignAssetModal from "../../components/AssignAsset";
 import axios from "axios";
 import AssignedUserDetailsModal from "../../components/AssignUserDetailsModal";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import {
   FaSearch,
   FaFileDownload,
   FaTrashAlt,
@@ -246,7 +254,7 @@ export default function MyAssets() {
         assetID: assetId,
         assetStatus: "assigned",
         assignedTo: {
-          employeeId: userDetails.employeeId ,
+          employeeId: userDetails.employeeId,
           name: userDetails.name,
           email: userDetails.email,
           department: userDetails.department,
@@ -307,26 +315,48 @@ export default function MyAssets() {
 
     return (
       <div className="flex items-center gap-2">
+        {/* Status Badge */}
         <span
-          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+          className={`px-3 py-1 min-w-[110px] text-center rounded-full text-xs font-semibold shadow-md backdrop-blur-md ${
             colorMap[status] || "bg-white/20 text-white"
           }`}
         >
           {status.replace(/_/g, " ")}
         </span>
-        {/* Quick status change dropdown */}
-        <select
-          value={status}
-          onChange={(e) => handleStatusChange(assetId, e.target.value)}
-          className="bg-transparent text-xs border-none outline-none cursor-pointer hover:bg-white/10 rounded p-1 text-white/70"
-          title="Quick status change"
-        >
-          {statusOptions.map((option) => (
-            <option key={option} value={option} className="bg-gray-800">
-              {option.replace(/_/g, " ")}
-            </option>
-          ))}
-        </select>
+
+        {/* Sexy Dropdown */}
+        <div className="relative">
+          <Select
+            value={status}
+            onValueChange={(value) => handleStatusChange(assetId, value)}
+          >
+            <SelectTrigger
+              className="min-w-[130px] px-3 py-1 rounded-full text-xs font-medium cursor-pointer
+               text-white/80 bg-white/5 border border-white/10 shadow-inner
+               hover:bg-white/10 backdrop-blur-md transition-all duration-300 ease-in-out
+               focus:ring-2 focus:ring-purple-400 focus:outline-none
+               transform hover:scale-105"
+            >
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-900 text-white border border-white/10 rounded-xl shadow-lg">
+              {statusOptions.map((option) => (
+                <SelectItem
+                  key={option}
+                  value={option}
+                  className="text-xs font-medium hover:bg-white/10 cursor-pointer rounded-md py-2"
+                >
+                  {option.replace(/_/g, " ")}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Custom Arrow */}
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/50 transition-transform duration-300 group-open:rotate-180">
+            ▼
+          </span>
+        </div>
       </div>
     );
   };
