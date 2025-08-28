@@ -204,6 +204,7 @@ exports.updateAssets = async (req, res) => {
     if (assetStatus === "retrieved") {
       asset.retrievedFrom = asset.assignedTo;
       asset.returnDate = new Date();
+      asset.retrievedAt = new Date();
       asset.assignedTo = null;
       asset.assignedDate = null;
       asset.toBeRetrievedFrom = null;
