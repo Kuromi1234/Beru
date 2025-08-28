@@ -10,7 +10,7 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
-    department: "IT", // enforced by backend, shown read-only
+    department: "IT", 
   });
 
   const navigate = useNavigate();
