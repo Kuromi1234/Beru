@@ -132,7 +132,7 @@ exports.assign = async (req, res) => {
       endUser: {
         employeeId: assignedTo.employeeId,
         name: assignedTo.name,
-        email: assignedTo.email || "unknown@company.com", // Provide fallback if needed
+        email: assignedTo.email || "unknown@company.com", 
       },
       assignedAt: new Date(),
       assignedBy: req.user.id,
@@ -182,7 +182,6 @@ exports.updateAssets = async (req, res) => {
       return res.status(404).json({ message: "Asset not found!" });
     }
 
-    // === Update asset ===
     asset.status = assetStatus;
 
     if (assetStatus === "assigned") {
@@ -216,7 +215,7 @@ exports.updateAssets = async (req, res) => {
 
     await asset.save();
 
-    // === Prepare history fields ===
+    // Determine endUser based on status
     let endUserDetails = { name: "N/A", email: "N/A", employeeId: "N/A" };
 
     if (assetStatus === "retrieved" && asset.retrievedFrom) {
