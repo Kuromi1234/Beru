@@ -30,8 +30,7 @@ app.use((req, res, next) => {
 // Global error handler
 app.use(errorHandler);
 
-//cron job  
-require("./utils/cronjob");
+
 
 // Start Server
 const PORT = process.env.PORT || 5000;
