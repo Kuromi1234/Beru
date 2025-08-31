@@ -11,7 +11,8 @@ const {
   updateAssets,
   deleteasset,
   getAssignedAssetsForCurrentUser,
-  getDashboardStats
+  getDashboardStats,
+  bulkUploadAssets,
 } = require("../controllers/assetController");
 
 const {getAssetHistory} = require("../controllers/assetHistoryController");
@@ -28,6 +29,7 @@ router.put("/assign", verifyToken, allowRoles("admin", "IT"), assign);
 router.put("/update", verifyToken, allowRoles("admin", "IT"), updateAssets);
 router.get("/assigned", verifyToken, allowRoles("admin", "IT"), getAssignedAssetsForCurrentUser);
 router.get("/history", verifyToken, allowRoles("admin", "IT"),getAssetHistory );
+router.put("/bulk", verifyToken, allowRoles("admin", "IT"), bulkUploadAssets);
 router.get("/:id", verifyToken, allowRoles("admin", "IT"), getAssetById);
 router.delete("/delete/:id", verifyToken, allowRoles("admin","IT"), deleteasset);
 
