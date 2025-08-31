@@ -1,6 +1,10 @@
 const Asset = require("../models/asset");
 const User = require("../models/user");
 const mongoose = require("mongoose");
+const exceljs = require("exceljs");
+const fs = require("fs"); 
+const path = require("path");
+const multer = require("multer");
 const AssetHistory = require("../models/assetHistory");
 
 // Create a new asset
@@ -346,3 +350,77 @@ exports.getDashboardStats = async (req, res) => {
       .json({ message: "Error fetching dashboard stats", error: err.message });
   }
 };
+
+
+//bulk upload assets via Excel
+// configure multer for file uploads
+const upload = multer({ dest: "uploads/" });
+
+// Bulk Upload Function
+exports.bulkUploadAssets = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // Read Excel file using ExcelJS
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(req.file.path);
+    const worksheet = workbook.worksheets[0]; // first sheet
+
+    let addedAssets = [];
+    let skippedAssets = [];
+
+    // Loop through each row (skipping headers at row 1)
+    for (let i = 2; i <= worksheet.rowCount; i++) {
+      const row = worksheet.getRow(i);
+
+      // assuming your excel columns: SerialNo, Model, Type, Status, AssignedTo (email)
+      const serialNumber = row.getCell(1).value?.toString().trim();
+      const model = row.getCell(2).value?.toString().trim();
+      const type = row.getCell(3).value?.toString().trim();
+      const status = row.getCell(4).value?.toString().trim();
+      const assignedToEmail = row.getCell(5).value?.toString().trim();
+
+      // check if asset with same serial number exists
+      const existingAsset = await Asset.findOne({ serialNumber });
+      if (existingAsset) {
+        skippedAssets.push({ serialNumber, reason: "Already exists" });
+        continue;
+      }
+
+      // prepare new asset object
+      let newAsset = new Asset({
+        serialNumber,
+        model,
+        type,
+        status,
+      });
+
+      // if status = assigned → link with user
+      if (status === "assigned" && assignedToEmail) {
+        const user = await User.findOne({ email: assignedToEmail });
+        if (user) {
+          newAsset.assignedTo = user._id;
+        } else {
+          skippedAssets.push({ serialNumber, reason: "Assigned user not found" });
+          continue;
+        }
+      }
+
+      // save to DB
+      const savedAsset = await newAsset.save();
+      addedAssets.push(savedAsset);
+    }
+
+    return res.status(200).json({
+      message: "Bulk upload completed",
+      added: addedAssets.length,
+      skipped: skippedAssets,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
