@@ -22,6 +22,7 @@ import MyAssets from "./pages/IT/MyAssets";
 import AddAssetPage from "./pages/IT/AddAssets";
 import ProfilePage from "./pages/IT/ProfilePage";
 import HistoryPage from "./pages/IT/History";
+import BulkUpload from "./pages/IT/Bulkupload";
 
 const App = () => {
   return (
@@ -55,6 +56,7 @@ const App = () => {
           <Route path="add-asset" element={<AddAssetPage />} />
           <Route path="profile" element={<ProfilePage/>}/>
           <Route path="history" element={<HistoryPage />} />
+          <Route path="bulk-upload" element={<BulkUpload />} />
         </Route>
       </Route>
     </Routes>
