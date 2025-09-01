@@ -5,6 +5,7 @@ import {
   FaUserCircle,
   FaPlus,
   FaTimes,
+  FaPlusSquare as Famultiple,
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
@@ -15,6 +16,7 @@ const links = [
   { to: "/it/assets", icon: <FaLaptop />, label: "View Assets" },
   { to: "/it/history", icon: <FaChartBar />, label: "History" },
   { to: "/it/profile", icon: <FaUserCircle />, label: "Profile" },
+  { to: "/it/bulk-upload", icon: <Famultiple/>, label: "Bulk Upload" },
 ];
 
 // Get dynamic IT user
