@@ -17,6 +17,7 @@ const {
 
 const {getAssetHistory} = require("../controllers/assetHistoryController");
 // Middleware
+const { upload } = require("../middleware/uploadMiddleware");
 const { verifyToken } = require("../middleware/verifytoken");
 const { allowRoles } = require("../middleware/checkrole");
 
@@ -29,7 +30,7 @@ router.put("/assign", verifyToken, allowRoles("admin", "IT"), assign);
 router.put("/update", verifyToken, allowRoles("admin", "IT"), updateAssets);
 router.get("/assigned", verifyToken, allowRoles("admin", "IT"), getAssignedAssetsForCurrentUser);
 router.get("/history", verifyToken, allowRoles("admin", "IT"),getAssetHistory );
-router.put("/bulk", verifyToken, allowRoles("admin", "IT"), bulkUploadAssets);
+router.post("/bulk", verifyToken, allowRoles("admin", "IT"), upload.single("file"), bulkUploadAssets);
 router.get("/:id", verifyToken, allowRoles("admin", "IT"), getAssetById);
 router.delete("/delete/:id", verifyToken, allowRoles("admin","IT"), deleteasset);
 
