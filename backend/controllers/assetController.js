@@ -1,7 +1,7 @@
 const Asset = require("../models/asset");
 const User = require("../models/user");
 const mongoose = require("mongoose");
-const Exceljs = require("exceljs");
+const ExcelJS= require("exceljs");
 const fs = require("fs"); 
 const path = require("path");
 const multer = require("multer");
@@ -353,46 +353,55 @@ exports.getDashboardStats = async (req, res) => {
 
 // Bulk upload assets from Excel file
 
+
 exports.bulkUploadAssets = async (req, res) => {
   try {
+    // Multer ensures req.file exists
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const workbook = new Exceljs.Workbook();
+    const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(req.file.path);
 
-    const worksheet = workbook.worksheets[0]; // first sheet
+    const worksheet = workbook.worksheets[0]; // First sheet
+    if (!worksheet) {
+      return res.status(400).json({ message: "Excel sheet is empty or invalid" });
+    }
+
     const rows = [];
 
     // Skip header row (row 1)
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-      if (rowNumber === 1) return; // skip headers
+      if (rowNumber === 1) return;
+
       rows.push({
-        name: row.getCell(0).value,
-        serialNumber: row.getCell(1).value,
-        model: row.getCell(2).value,
-        type: row.getCell(3).value,
-        status: row.getCell(4).value
+        name: row.getCell(1).value ? String(row.getCell(1).value).trim() : "Unknown",
+        serialNumber: row.getCell(2).value ? String(row.getCell(2).value).trim() : null,
+        model: row.getCell(3).value ? String(row.getCell(3).value).trim() : null,
+        assetType: row.getCell(4).value ? String(row.getCell(4).value).trim() : null,
+        status: row.getCell(5).value ? String(row.getCell(5).value).trim() : "in_stock"
       });
     });
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: "No valid rows found in Excel" });
+    }
 
     const addedAssets = [];
     const skippedAssets = [];
 
     for (const row of rows) {
-      // check if asset already exists by serial number
+      if (!row.serialNumber) {
+        skippedAssets.push("Missing Serial");
+        continue;
+      }
+
       const existing = await Asset.findOne({ serialNumber: row.serialNumber });
       if (existing) {
         skippedAssets.push(row.serialNumber);
       } else {
-        const newAsset = new Asset({
-          name: row.name|| "Unknown Model",
-          serialNumber: row.serialNumber,
-          model: row.model,
-          type: row.type,
-          status: row.status || "in_stock"
-        });
+        const newAsset = new Asset(row);
         await newAsset.save();
         addedAssets.push(newAsset);
       }
@@ -406,7 +415,7 @@ exports.bulkUploadAssets = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error processing bulk upload", error });
+    console.error("Bulk Upload Error:", error);
+    res.status(500).json({ message: "Error processing bulk upload", error: error.message });
   }
 };
