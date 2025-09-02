@@ -15,8 +15,9 @@ const links = [
   { to: "/it/add-asset", icon: <FaPlus />, label: "Add Asset" },
   { to: "/it/assets", icon: <FaLaptop />, label: "View Assets" },
   { to: "/it/history", icon: <FaChartBar />, label: "History" },
-  { to: "/it/profile", icon: <FaUserCircle />, label: "Profile" },
   { to: "/it/bulk-upload", icon: <Famultiple/>, label: "Bulk Upload" },
+  { to: "/it/profile", icon: <FaUserCircle />, label: "Profile" },
+  
 ];
 
 // Get dynamic IT user
