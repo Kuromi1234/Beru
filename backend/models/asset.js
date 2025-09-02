@@ -9,7 +9,6 @@ const assetSchema = new mongoose.Schema(
     serialNumber: {
       type: String,
       required: true,
-      unique: true,
     },
     description: {
       type: String,
