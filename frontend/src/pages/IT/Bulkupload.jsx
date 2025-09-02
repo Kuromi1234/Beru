@@ -49,14 +49,17 @@ export default function BulkUpload() {
     } catch (err) {
       setError(
         err.response?.data?.error ||
-          "Something went wrong while uploading. Try again."
+          (typeof err.response?.data === "string"
+            ? err.response.data
+            : "Something went wrong...")
       );
+
       setMessage(null);
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black p-6 gap-8">
+    <div className="flex flex-col md:flex-row items-center justify-center mt-15  p-6 gap-8">
       {/* Upload Section */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
