@@ -3,7 +3,7 @@ const AssetHistory = require("../models/assetHistory");
 
 exports.getAssetHistory = async (req, res) => {
   try {
-    const { employeeId, serialNumber, fromDate, toDate, page = 1, limit = 10 } = req.query;
+    const { employeeId, serialNumber, fromDate, toDate, action, page = 1, limit = 10 } = req.query;
 
     let filter = {};
 
@@ -20,6 +20,10 @@ exports.getAssetHistory = async (req, res) => {
       }
     }
 
+    if (action) {
+      filter.action = action; // e.g., "assigned", "retrieved", "bulk_upload"
+    }
+
     if (fromDate || toDate) {
       filter.createdAt = {};
       if (fromDate) filter.createdAt.$gte = new Date(fromDate);
@@ -34,11 +38,12 @@ exports.getAssetHistory = async (req, res) => {
     const totalCount = await AssetHistory.countDocuments(filter);
 
     const history = await AssetHistory.find(filter)
-      .populate("asset", "serialNumber model assetType")
+      .populate("asset", "serialNumber model assetType") // will be null for bulk_upload
       .populate("assignedBy", "name email")
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(pageLimit);
+      .limit(pageLimit)
+      .lean(); // return plain JS objects (makes it easier to send details)
 
     res.status(200).json({
       success: true,
