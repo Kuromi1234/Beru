@@ -1,6 +1,5 @@
 const Asset = require("../models/asset");
 const User = require("../models/user");
-const mongoose = require("mongoose");
 const ExcelJS= require("exceljs");
 const fs = require("fs"); 
 const path = require("path");
@@ -354,27 +353,25 @@ exports.getDashboardStats = async (req, res) => {
 // Bulk upload assets from Excel file
 
 
+// Assuming you have a History model
+
 exports.bulkUploadAssets = async (req, res) => {
   try {
-    // Multer ensures req.file exists
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(req.file.path);
+    const worksheet = workbook.worksheets[0];
 
-    const worksheet = workbook.worksheets[0]; // First sheet
     if (!worksheet) {
       return res.status(400).json({ message: "Excel sheet is empty or invalid" });
     }
 
     const rows = [];
-
-    // Skip header row (row 1)
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       if (rowNumber === 1) return;
-
       rows.push({
         name: row.getCell(1).value ? String(row.getCell(1).value).trim() : "Unknown",
         serialNumber: row.getCell(2).value ? String(row.getCell(2).value).trim() : null,
@@ -406,6 +403,25 @@ exports.bulkUploadAssets = async (req, res) => {
         addedAssets.push(newAsset);
       }
     }
+    const brandCounts = addedAssets.reduce((acc, asset) => {
+      const brand = asset.name.toLowerCase();
+      acc[brand] = (acc[brand] || 0) + 1;
+      return acc;
+    }, {});
+
+    await AssetHistory.create({
+      action: "bulk_upload",
+      user: req.user?.name || "system", // if you have auth
+      details: {
+        totalUploaded: addedAssets.length,
+        totalSkipped: skippedAssets.length,
+        brandCounts,
+        assetTypeCounts: addedAssets.reduce((acc, asset) => {
+          acc[asset.assetType] = (acc[asset.assetType] || 0) + 1;
+          return acc;
+        }, {})
+      }
+    });
 
     return res.status(200).json({
       message: "Bulk upload completed",
