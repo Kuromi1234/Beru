@@ -70,7 +70,16 @@ export default function HistoryPage() {
     }
 
     const csvRows = [
-      ["Serial No", "Model", "Type", "Action", "End User", "Emp ID", "By", "Date"],
+      [
+        "Serial No",
+        "Model",
+        "Type",
+        "Action",
+        "End User",
+        "Emp ID",
+        "By",
+        "Date",
+      ],
       ...history.map((item) => [
         item.asset?.serialNumber || "N/A",
         item.asset?.model || "N/A",
@@ -104,7 +113,9 @@ export default function HistoryPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-2xl sm:text-3xl font-bold text-white">ASSET HISTORY</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">
+          ASSET HISTORY
+        </h1>
         <button
           onClick={exportToCSV}
           className="bg-purple-500/30 hover:bg-purple-500/50 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105"
@@ -194,16 +205,104 @@ export default function HistoryPage() {
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.03 }}
-                  className="hover:bg-white/5 border-b border-white/10"
+                  className="relative group hover:bg-white/5 border-b border-white/10"
                 >
-                  <td className="py-2 px-4">{item.asset?.serialNumber || "N/A"}</td>
-                  <td className="py-2 px-4">{item.asset?.model || "N/A"}</td>
-                  <td className="py-2 px-4">{item.asset?.assetType || "N/A"}</td>
-                  <td className="py-2 px-4 capitalize">{item.action || "N/A"}</td>
-                  <td className="py-2 px-4">{item.endUser?.name || "N/A"}</td>
-                  <td className="py-2 px-4">{item.endUser?.employeeId || "N/A"}</td>
-                  <td className="py-2 px-4">{item.assignedBy?.name || "N/A"}</td>
-                  <td className="py-2 px-4">{new Date(item.createdAt).toLocaleString()}</td>
+                  {item.action === "bulk_upload" ? (
+                    <>
+                      <td
+                        className="py-2 px-4 text-purple-400 font-medium"
+                        colSpan={8}
+                      >
+                        📦 Bulk Upload — {item.details?.totalUploaded || 0}{" "}
+                        assets added, {item.details?.totalSkipped || 0} skipped
+                      </td>
+
+                      {/* Hover Card */}
+                      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block z-50">
+                        <div className="bg-black/90 text-white rounded-2xl shadow-2xl p-4 w-[300px] backdrop-blur-md border border-white/10">
+                          <h4 className="font-semibold text-lg mb-2">
+                            Bulk Upload Details
+                          </h4>
+                          <p className="text-sm mb-1">
+                            ✅ Uploaded:{" "}
+                            <span className="font-bold text-green-400">
+                              {item.details?.totalUploaded || 0}
+                            </span>
+                          </p>
+                          <p className="text-sm mb-3">
+                            ⚠️ Skipped:{" "}
+                            <span className="font-bold text-red-400">
+                              {item.details?.totalSkipped || 0}
+                            </span>
+                          </p>
+
+                          <div className="border-t border-white/20 pt-2">
+                            <h5 className="text-sm font-semibold mb-1">
+                              By Brand
+                            </h5>
+                            <ul className="text-xs space-y-1">
+                              {Object.entries(
+                                item.details?.brandCounts || {}
+                              ).map(([brand, count]) => (
+                                <li
+                                  key={brand}
+                                  className="flex justify-between"
+                                >
+                                  <span>{brand}</span>
+                                  <span className="text-purple-300">
+                                    {count}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div className="border-t border-white/20 pt-2 mt-2">
+                            <h5 className="text-sm font-semibold mb-1">
+                              By Type
+                            </h5>
+                            <ul className="text-xs space-y-1">
+                              {Object.entries(
+                                item.details?.assetTypeCounts || {}
+                              ).map(([type, count]) => (
+                                <li key={type} className="flex justify-between">
+                                  <span>{type}</span>
+                                  <span className="text-blue-300">{count}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <td className="py-2 px-4">
+                        {item.asset?.serialNumber || "N/A"}
+                      </td>
+                      <td className="py-2 px-4">
+                        {item.asset?.model || "N/A"}
+                      </td>
+                      <td className="py-2 px-4">
+                        {item.asset?.assetType || "N/A"}
+                      </td>
+                      <td className="py-2 px-4 capitalize">
+                        {item.action || "N/A"}
+                      </td>
+                      <td className="py-2 px-4">
+                        {item.endUser?.name || "N/A"}
+                      </td>
+                      <td className="py-2 px-4">
+                        {item.endUser?.employeeId || "N/A"}
+                      </td>
+                      <td className="py-2 px-4">
+                        {item.assignedBy?.name || "N/A"}
+                      </td>
+                      <td className="py-2 px-4">
+                        {new Date(item.createdAt).toLocaleString()}
+                      </td>
+                    </>
+                  )}
                 </motion.tr>
               ))}
             </tbody>
