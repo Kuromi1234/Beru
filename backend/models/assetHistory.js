@@ -1,5 +1,3 @@
-
-
 const mongoose = require("mongoose");
 
 const assetHistorySchema = new mongoose.Schema(
@@ -21,7 +19,7 @@ const assetHistorySchema = new mongoose.Schema(
     },
     action: {
       type: String,
-      enum: ["in_stock", "assigned", "retrieved", "to_be_retrieved", "damaged", "repair", "discarded"],
+      enum: ["in_stock", "assigned", "retrieved", "to_be_retrieved", "damaged", "repair", "discarded","bulk_upload"],
       required: true,
     },
     assignedAt: {
