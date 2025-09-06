@@ -198,6 +198,13 @@ const ITDashboard = () => {
           fromColor="gray-600/50"
           toColor="gray-400/50"
         />
+        <StatCard
+          title="Damaged"
+          value={stats.damaged}
+          icon={<FaTimesCircle />}
+          fromColor="red-600/50"
+          toColor="rose-500/50"
+        />
       </div>
 
       {/* Bar Chart */}
