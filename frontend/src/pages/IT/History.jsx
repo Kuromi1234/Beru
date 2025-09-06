@@ -208,21 +208,35 @@ export default function HistoryPage() {
                   className="relative group hover:bg-white/5 border-b border-white/10"
                 >
                   {item.action === "bulk_upload" ? (
-                    <>
-                      <td
-                        className="py-2 px-4 text-purple-400 font-medium"
-                        colSpan={8}
-                      >
-                        📦 Bulk Upload — {item.details?.totalUploaded || 0}{" "}
-                        assets added, {item.details?.totalSkipped || 0} skipped
-                      </td>
+                    <div className="relative group">
+                      <span className="cursor-pointer text-purple-400 font-semibold">
+                        Bulk Upload
+                      </span>
 
                       {/* Hover Card */}
-                      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block z-50">
-                        <div className="bg-black/90 text-white rounded-2xl shadow-2xl p-4 w-[300px] backdrop-blur-md border border-white/10">
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        whileHover={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                        className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 pointer-events-none"
+                      >
+                        <motion.div
+                          initial={{ boxShadow: "0 0 0px rgba(168,85,247,0)" }}
+                          animate={{
+                            boxShadow: "0 0 20px rgba(168,85,247,0.6)",
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            repeatType: "reverse",
+                          }}
+                          className="bg-black/90 text-white rounded-2xl shadow-2xl p-4 w-[300px] backdrop-blur-md border border-purple-500/20 pointer-events-auto"
+                        >
                           <h4 className="font-semibold text-lg mb-2">
                             Bulk Upload Details
                           </h4>
+
+                          {/* Counts */}
                           <p className="text-sm mb-1">
                             ✅ Uploaded:{" "}
                             <span className="font-bold text-green-400">
@@ -236,6 +250,7 @@ export default function HistoryPage() {
                             </span>
                           </p>
 
+                          {/* Brand counts */}
                           <div className="border-t border-white/20 pt-2">
                             <h5 className="text-sm font-semibold mb-1">
                               By Brand
@@ -257,6 +272,7 @@ export default function HistoryPage() {
                             </ul>
                           </div>
 
+                          {/* Asset type counts */}
                           <div className="border-t border-white/20 pt-2 mt-2">
                             <h5 className="text-sm font-semibold mb-1">
                               By Type
@@ -272,9 +288,9 @@ export default function HistoryPage() {
                               ))}
                             </ul>
                           </div>
-                        </div>
-                      </div>
-                    </>
+                        </motion.div>
+                      </motion.div>
+                    </div>
                   ) : (
                     <>
                       <td className="py-2 px-4">
