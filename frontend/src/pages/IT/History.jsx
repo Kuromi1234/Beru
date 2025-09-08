@@ -3,6 +3,9 @@ import axios from "axios";
 import { FaSearch, FaFileDownload } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
+import { useRef } from "react";
+import { createPortal } from "react-dom";
+import { AnimatePresence } from "framer-motion";
 
 const API_BASE_URL = "http://localhost:5000/api/assets/history";
 
@@ -89,6 +92,7 @@ export default function HistoryPage() {
         item.endUser?.employeeId || "N/A",
         item.assignedBy?.name || "N/A",
         new Date(item.createdAt).toLocaleString(),
+        
       ]),
     ];
 
@@ -200,6 +204,7 @@ export default function HistoryPage() {
             </thead>
             <tbody>
               {history.map((item, i) => (
+                console.log("History item:", item),
                 <motion.tr
                   key={item._id}
                   initial={{ opacity: 0, y: 5 }}
@@ -208,89 +213,9 @@ export default function HistoryPage() {
                   className="relative group hover:bg-white/5 border-b border-white/10"
                 >
                   {item.action === "bulk_upload" ? (
-                    <div className="relative group">
-                      <span className="cursor-pointer text-purple-400 font-semibold">
-                        Bulk Upload
-                      </span>
-
-                      {/* Hover Card */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        whileHover={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{ duration: 0.25, ease: "easeOut" }}
-                        className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 pointer-events-none"
-                      >
-                        <motion.div
-                          initial={{ boxShadow: "0 0 0px rgba(168,85,247,0)" }}
-                          animate={{
-                            boxShadow: "0 0 20px rgba(168,85,247,0.6)",
-                          }}
-                          transition={{
-                            duration: 1.5,
-                            repeat: Infinity,
-                            repeatType: "reverse",
-                          }}
-                          className="bg-black/90 text-white rounded-2xl shadow-2xl p-4 w-[300px] backdrop-blur-md border border-purple-500/20 pointer-events-auto"
-                        >
-                          <h4 className="font-semibold text-lg mb-2">
-                            Bulk Upload Details
-                          </h4>
-
-                          {/* Counts */}
-                          <p className="text-sm mb-1">
-                            ✅ Uploaded:{" "}
-                            <span className="font-bold text-green-400">
-                              {item.details?.totalUploaded || 0}
-                            </span>
-                          </p>
-                          <p className="text-sm mb-3">
-                            ⚠️ Skipped:{" "}
-                            <span className="font-bold text-red-400">
-                              {item.details?.totalSkipped || 0}
-                            </span>
-                          </p>
-
-                          {/* Brand counts */}
-                          <div className="border-t border-white/20 pt-2">
-                            <h5 className="text-sm font-semibold mb-1">
-                              By Brand
-                            </h5>
-                            <ul className="text-xs space-y-1">
-                              {Object.entries(
-                                item.details?.brandCounts || {}
-                              ).map(([brand, count]) => (
-                                <li
-                                  key={brand}
-                                  className="flex justify-between"
-                                >
-                                  <span>{brand}</span>
-                                  <span className="text-purple-300">
-                                    {count}
-                                  </span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {/* Asset type counts */}
-                          <div className="border-t border-white/20 pt-2 mt-2">
-                            <h5 className="text-sm font-semibold mb-1">
-                              By Type
-                            </h5>
-                            <ul className="text-xs space-y-1">
-                              {Object.entries(
-                                item.details?.assetTypeCounts || {}
-                              ).map(([type, count]) => (
-                                <li key={type} className="flex justify-between">
-                                  <span>{type}</span>
-                                  <span className="text-blue-300">{count}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </motion.div>
-                      </motion.div>
-                    </div>
+                    <td colSpan={8} className="py-2 px-4">
+                      <BulkUploadHover item={item} />
+                    </td>
                   ) : (
                     <>
                       <td className="py-2 px-4">
@@ -352,3 +277,125 @@ export default function HistoryPage() {
     </section>
   );
 }
+const BulkUploadHover = ({ item }) => {
+  const anchorRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    const update = () => {
+      if (!anchorRef.current) return;
+      const r = anchorRef.current.getBoundingClientRect();
+      setPos({
+        top: r.bottom + window.scrollY + 8,
+        left: r.left + window.scrollX,
+      });
+    };
+    update();
+
+    if (open) {
+      window.addEventListener("scroll", update, true);
+      window.addEventListener("resize", update);
+    }
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [open]);
+
+  return (
+    <>
+      <span
+        ref={anchorRef}
+        className="cursor-pointer text-purple-400 font-semibold"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
+        📦 Bulk Upload — {item.details?.totalUploaded || 0} added,{" "}
+        {item.details?.totalSkipped || 0} skipped{" "}
+        <span className="text-xs text-white/60">
+          • By {item.user || "System"} •{" "}
+          {new Date(item.createdAt).toLocaleString()}
+        </span>
+      </span>
+
+      <AnimatePresence>
+        {open &&
+          anchorRef.current &&
+          createPortal(
+            <motion.div
+              initial={{ opacity: 0, y: 8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.98 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              style={{
+                position: "absolute",
+                top: pos.top,
+                left: pos.left,
+                zIndex: 1000,
+              }}
+              onMouseEnter={() => setOpen(true)}
+              onMouseLeave={() => setOpen(false)}
+            >
+              <motion.div
+                initial={{ boxShadow: "0 0 0px rgba(168,85,247,0)" }}
+                animate={{ boxShadow: "0 0 20px rgba(168,85,247,0.6)" }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                }}
+                className="bg-black/90 text-white rounded-2xl shadow-2xl p-4 w-[300px] backdrop-blur-md border border-purple-500/20"
+              >
+                <h4 className="font-semibold text-lg mb-2">
+                  Bulk Upload Details
+                </h4>
+
+                <p className="text-sm mb-1">
+                  ✅ Uploaded:{" "}
+                  <span className="font-bold text-green-400">
+                    {item.details?.totalUploaded || 0}
+                  </span>
+                </p>
+                <p className="text-sm mb-3">
+                  ⚠️ Skipped:{" "}
+                  <span className="font-bold text-red-400">
+                    {item.details?.totalSkipped || 0}
+                  </span>
+                </p>
+
+                <div className="border-t border-white/20 pt-2">
+                  <h5 className="text-sm font-semibold mb-1">By Brand</h5>
+                  <ul className="text-xs space-y-1">
+                    {Object.entries(item.details?.brandCounts || {}).map(
+                      ([brand, count]) => (
+                        <li key={brand} className="flex justify-between">
+                          <span>{brand}</span>
+                          <span className="text-purple-300">{count}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </div>
+
+                <div className="border-t border-white/20 pt-2 mt-2">
+                  <h5 className="text-sm font-semibold mb-1">By Type</h5>
+                  <ul className="text-xs space-y-1">
+                    {Object.entries(item.details?.assetTypeCounts || {}).map(
+                      ([type, count]) => (
+                        <li key={type} className="flex justify-between">
+                          <span>{type}</span>
+                          <span className="text-blue-300">{count}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </div>
+              </motion.div>
+            </motion.div>,
+            document.body
+          )}
+      </AnimatePresence>
+    </>
+  );
+};
