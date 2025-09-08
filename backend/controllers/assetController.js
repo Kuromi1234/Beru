@@ -1,7 +1,7 @@
 const Asset = require("../models/asset");
 const User = require("../models/user");
-const ExcelJS= require("exceljs");
-const fs = require("fs"); 
+const ExcelJS = require("exceljs");
+const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const AssetHistory = require("../models/assetHistory");
@@ -135,7 +135,7 @@ exports.assign = async (req, res) => {
       endUser: {
         employeeId: assignedTo.employeeId,
         name: assignedTo.name,
-        email: assignedTo.email || "unknown@company.com", 
+        email: assignedTo.email || "unknown@company.com",
       },
       assignedAt: new Date(),
       assignedBy: req.user.id,
@@ -163,7 +163,9 @@ exports.updateAssets = async (req, res) => {
     const { assetID, assetStatus, assignedTo } = req.body;
 
     if (!assetID || !assetStatus) {
-      return res.status(400).json({ message: "Asset ID and status are required" });
+      return res
+        .status(400)
+        .json({ message: "Asset ID and status are required" });
     }
 
     const allowedStatuses = [
@@ -238,7 +240,7 @@ exports.updateAssets = async (req, res) => {
     // === Create history entry ===
     await AssetHistory.create({
       asset: asset._id,
-      assignedBy: req.user.id,  // the admin/staff
+      assignedBy: req.user.id, // the admin/staff
       action: assetStatus,
       assignedTo: asset.assignedTo || null,
       endUser: endUserDetails,
@@ -352,9 +354,7 @@ exports.getDashboardStats = async (req, res) => {
 
 // Bulk upload assets from Excel file
 
-
 // Assuming you have a History model
-
 exports.bulkUploadAssets = async (req, res) => {
   try {
     if (!req.file) {
@@ -366,72 +366,144 @@ exports.bulkUploadAssets = async (req, res) => {
     const worksheet = workbook.worksheets[0];
 
     if (!worksheet) {
-      return res.status(400).json({ message: "Excel sheet is empty or invalid" });
+      // optionally cleanup file
+      // fs.unlinkSync(req.file.path);
+      return res
+        .status(400)
+        .json({ message: "Excel sheet is empty or invalid" });
     }
 
+    // 1) Read rows into memory
     const rows = [];
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-      if (rowNumber === 1) return;
+      if (rowNumber === 1) return; // skip header
       rows.push({
-        name: row.getCell(1).value ? String(row.getCell(1).value).trim() : "Unknown",
-        serialNumber: row.getCell(2).value ? String(row.getCell(2).value).trim() : null,
-        model: row.getCell(3).value ? String(row.getCell(3).value).trim() : null,
-        assetType: row.getCell(4).value ? String(row.getCell(4).value).trim() : null,
-        status: row.getCell(5).value ? String(row.getCell(5).value).trim() : "in_stock"
+        name: row.getCell(1).value
+          ? String(row.getCell(1).value).trim()
+          : "Unknown",
+        serialNumber: row.getCell(2).value
+          ? String(row.getCell(2).value).trim()
+          : null,
+        model: row.getCell(3).value
+          ? String(row.getCell(3).value).trim()
+          : null,
+        assetType: row.getCell(4).value
+          ? String(row.getCell(4).value).trim()
+          : null,
+        status: row.getCell(5).value
+          ? String(row.getCell(5).value).trim()
+          : "in_stock",
       });
     });
 
     if (rows.length === 0) {
+      // fs.unlinkSync(req.file.path);
       return res.status(400).json({ message: "No valid rows found in Excel" });
     }
 
+    // 2) Gather serials from uploaded file (exclude nulls)
+    const fileSerials = rows.map((r) => r.serialNumber).filter(Boolean);
+
+    // 3) Query DB once for existing serials to avoid repeated findOne() in loop
+    const existingDocs = fileSerials.length
+      ? await Asset.find({ serialNumber: { $in: fileSerials } })
+          .select("serialNumber")
+          .lean()
+      : [];
+    const existingSerialSet = new Set(
+      existingDocs.map((d) => String(d.serialNumber))
+    );
+
+    // 4) Prepare and insert new assets
     const addedAssets = [];
-    const skippedAssets = [];
+    const skippedAssets = []; // keep reasons to return better feedback
+    const addedSerialsSet = new Set(); // to avoid duplicates inside the file
 
     for (const row of rows) {
+      // missing serial
       if (!row.serialNumber) {
-        skippedAssets.push("Missing Serial");
+        skippedAssets.push({ reason: "missing_serial" });
         continue;
       }
 
-      const existing = await Asset.findOne({ serialNumber: row.serialNumber });
-      if (existing) {
-        skippedAssets.push(row.serialNumber);
-      } else {
-        const newAsset = new Asset(row);
-        await newAsset.save();
-        addedAssets.push(newAsset);
+      // already in DB
+      if (existingSerialSet.has(row.serialNumber)) {
+        skippedAssets.push({
+          reason: "already_exists_db",
+          serial: row.serialNumber,
+        });
+        continue;
       }
+
+      // duplicate inside uploaded file
+      if (addedSerialsSet.has(row.serialNumber)) {
+        skippedAssets.push({
+          reason: "duplicate_in_file",
+          serial: row.serialNumber,
+        });
+        continue;
+      }
+
+      // Save new asset (you can use insertMany for bulk, but saving one-by-one keeps things simple & gives full mongoose docs back)
+      const newAsset = new Asset(row);
+      await newAsset.save();
+      addedAssets.push(newAsset);
+      addedSerialsSet.add(row.serialNumber);
     }
+
+    // 5) If nothing new was added -> return 409 (or 400) and DO NOT create a successful history entry
+    if (addedAssets.length === 0) {
+      // fs.unlinkSync(req.file.path);
+      return res.status(409).json({
+        message:
+          "No new assets were added. All rows were duplicates or invalid.",
+        addedCount: 0,
+        skippedCount: skippedAssets.length,
+        skipped: skippedAssets,
+      });
+    }
+
+    // 6) Build brand and assetType counts from actually added assets
     const brandCounts = addedAssets.reduce((acc, asset) => {
-      const brand = asset.name.toLowerCase();
+      const brand = (asset.name || "unknown").toString().toLowerCase();
       acc[brand] = (acc[brand] || 0) + 1;
       return acc;
     }, {});
 
+    const assetTypeCounts = addedAssets.reduce((acc, asset) => {
+      const type = asset.assetType || "unknown";
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {});
+
+    // 7) Create history record referencing User (store _id)
     await AssetHistory.create({
       action: "bulk_upload",
-      user: req.user?.name || "system", // if you have auth
+      assignedBy: req.user?._id || null, // store User ObjectId
+      assignedAt: new Date(),
       details: {
         totalUploaded: addedAssets.length,
         totalSkipped: skippedAssets.length,
         brandCounts,
-        assetTypeCounts: addedAssets.reduce((acc, asset) => {
-          acc[asset.assetType] = (acc[asset.assetType] || 0) + 1;
-          return acc;
-        }, {})
-      }
+        assetTypeCounts,
+        skippedSerials: skippedAssets.map((s) => s.serial || s.reason), // optional
+      },
     });
+    console.log("BULK HISTORY SAVED ->", JSON.stringify(AssetHistory, null, 2));
+    // optionally cleanup file
+    // fs.unlinkSync(req.file.path);
 
+    // 8) Response
     return res.status(200).json({
       message: "Bulk upload completed",
       addedCount: addedAssets.length,
       skippedCount: skippedAssets.length,
-      skippedSerials: skippedAssets
+      skipped: skippedAssets,
     });
-
   } catch (error) {
     console.error("Bulk Upload Error:", error);
-    res.status(500).json({ message: "Error processing bulk upload", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Error processing bulk upload", error: error.message });
   }
 };
