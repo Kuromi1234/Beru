@@ -8,9 +8,9 @@ const assetHistorySchema = new mongoose.Schema(
       required: false,
     },
     endUser: {
-      name: { type: String, required: false},
+      name: { type: String, required: false },
       email: { type: String, required: false },
-      employeeId: { type: String, required: false},
+      employeeId: { type: String, required: false },
     },
     assignedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -19,9 +19,19 @@ const assetHistorySchema = new mongoose.Schema(
     },
     action: {
       type: String,
-      enum: ["in_stock", "assigned", "retrieved", "to_be_retrieved", "damaged", "repair", "discarded","bulk_upload"],
+      enum: [
+        "in_stock",
+        "assigned",
+        "retrieved",
+        "to_be_retrieved",
+        "damaged",
+        "repair",
+        "discarded",
+        "bulk_upload",
+      ],
       required: true,
     },
+   
     assignedAt: {
       type: Date,
       default: Date.now,
