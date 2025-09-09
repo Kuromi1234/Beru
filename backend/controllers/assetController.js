@@ -477,7 +477,8 @@ exports.bulkUploadAssets = async (req, res) => {
     }, {});
 
     // 7) Create history record referencing User (store _id)
-    await AssetHistory.create({
+    // 7) Create history record referencing User (store _id)
+    const historyRecord = await AssetHistory.create({
       action: "bulk_upload",
       assignedBy: req.user?._id || null, // store User ObjectId
       assignedAt: new Date(),
@@ -486,10 +487,16 @@ exports.bulkUploadAssets = async (req, res) => {
         totalSkipped: skippedAssets.length,
         brandCounts,
         assetTypeCounts,
-        skippedSerials: skippedAssets.map((s) => s.serial || s.reason), // optional
+        skippedSerials: skippedAssets.map((s) => s.serial || s.reason),
       },
     });
-    console.log("BULK HISTORY SAVED ->", JSON.stringify(AssetHistory, null, 2));
+
+    // 👇 Now you’ll actually see the created doc
+    console.log(
+      "BULK HISTORY SAVED ->",
+      JSON.stringify(historyRecord, null, 2)
+    );
+
     // optionally cleanup file
     // fs.unlinkSync(req.file.path);
 
