@@ -31,7 +31,14 @@ const assetHistorySchema = new mongoose.Schema(
       ],
       required: true,
     },
-   
+    details: {
+      totalUploaded: { type: Number, default: 0 },
+      totalSkipped: { type: Number, default: 0 },
+      brandCounts: { type: Map, of: Number }, // Map<string, number>
+      assetTypeCounts: { type: Map, of: Number },
+      skippedSerials: [String],
+    },
+
     assignedAt: {
       type: Date,
       default: Date.now,
