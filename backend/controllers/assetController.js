@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const AssetHistory = require("../models/assetHistory");
+const sendEmail = require("../utils/outlookmail");
 
 // Create a new asset
 exports.createAsset = async (req, res) => {
@@ -476,11 +477,9 @@ exports.bulkUploadAssets = async (req, res) => {
       return acc;
     }, {});
 
-    // 7) Create history record referencing User (store _id)
-    // 7) Create history record referencing User (store _id)
     const historyRecord = await AssetHistory.create({
       action: "bulk_upload",
-      assignedBy: req.user?._id || null, // store User ObjectId
+      assignedBy: req.user?._id || null,
       assignedAt: new Date(),
       details: {
         totalUploaded: addedAssets.length,
@@ -491,16 +490,31 @@ exports.bulkUploadAssets = async (req, res) => {
       },
     });
 
-    // 👇 Now you’ll actually see the created doc
-    console.log(
-      "BULK HISTORY SAVED ->",
-      JSON.stringify(historyRecord, null, 2)
-    );
+    try {
+      await sendEmail({
+        to: "arjunnathhh@gmail.com", 
+        subject: "Bulk Asset Upload Report",
+        text: `
+      Bulk Upload Report
+      ----------------------------
+      Uploaded by: ${req.user?.email || "Unknown"}
+      Total Added: ${addedAssets.length}
+      Total Skipped: ${skippedAssets.length}
 
-    // optionally cleanup file
-    // fs.unlinkSync(req.file.path);
+      Brand Breakdown: ${JSON.stringify(brandCounts, null, 2)}
+      Type Breakdown: ${JSON.stringify(assetTypeCounts, null, 2)}
 
-    // 8) Response
+      Skipped: ${skippedAssets
+        .map((s) => `${s.serial || "N/A"} (${s.reason})`)
+        .join(", ")}
+    `,
+      });
+
+      console.log("📧 Bulk upload email sent successfully");
+    } catch (err) {
+      console.error("❌ Failed to send bulk upload email:", err.message);
+    }
+
     return res.status(200).json({
       message: "Bulk upload completed",
       addedCount: addedAssets.length,
