@@ -252,7 +252,6 @@ export default function HistoryPage() {
         )}
       </div>
 
-      {/* Popup OUTSIDE table */}
       <BulkUploadPopup
         item={popupItem}
         open={!!popupItem}
