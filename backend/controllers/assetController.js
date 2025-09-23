@@ -5,7 +5,8 @@ const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const AssetHistory = require("../models/assetHistory");
-const sendEmail = require("../utils/outlookmail");
+const sendEmail = require("../utils/sendemail");
+const { notifyAssetAssignment, notifyAssetRetrieval } = require("../utils/notificationService");
 
 // Create a new asset
 exports.createAsset = async (req, res) => {
@@ -144,6 +145,8 @@ exports.assign = async (req, res) => {
     });
 
     await history.save();
+    // Notify IT admins about the assignment
+    await notifyAssetAssignment(asset.serialNumber, asset.assignedTo, process.env.IT_ADMIN_EMAILS.split(','));
 
     res.status(200).json({
       message: `Asset successfully assigned to ${assignedTo.name} (${assignedTo.employeeId})`,
@@ -230,6 +233,8 @@ exports.updateAssets = async (req, res) => {
         name: asset.retrievedFrom.name,
         email: asset.retrievedFrom.email,
       };
+      await notifyAssetRetrieval(asset.serialNumber, endUserDetails, process.env.IT_ADMIN_EMAILS.split(','));
+      
     } else if (assetStatus === "to_be_retrieved" && asset.toBeRetrievedFrom) {
       endUserDetails = {
         employeeId: asset.toBeRetrievedFrom.employeeId,
@@ -247,6 +252,8 @@ exports.updateAssets = async (req, res) => {
       endUser: endUserDetails,
     });
 
+    // Notify IT admins about retrieval
+ 
     res.status(200).json({
       message: `Asset status updated to '${assetStatus}'`,
       asset,
