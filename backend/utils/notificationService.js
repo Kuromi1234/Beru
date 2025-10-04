@@ -11,7 +11,7 @@ const notifyAssetAssignment = async (assetID, assignedTo, adminEmails) => {
 
 const notifyAssetRetrieval = async (assetID, retrievedFrom, adminEmails) => {
   const subject = "Asset Retrieval Notification";
-  const text = `Asset  : ${assetID} has been retrieved from : ${retrievedFrom} at ${new Date().toDateString()} \n. Please take necessary actions and update in the system.`;
+  const text = `Asset E : ${assetID} has been retrieved from : ${retrievedFrom} at ${new Date().toDateString()} \n. Please take necessary actions and update in the system.`;
 
   for (const email in adminEmails) {
     await sendEmail(email, subject, text);
