@@ -143,38 +143,34 @@ export default function MyAssets() {
     try {
       setLoading(true);
 
-      const updateData = {
-        _id: id,
-        name: editForm.name,
-        serialNumber: editForm.serialNumber,
-        model: editForm.model,
-        assetType: editForm.assetType,
-        status: editForm.status,
-      };
-      console.log("Token headers being sent:", getAuthHeaders());
-
-      await axios.put(
-        `${API_BASE_URL}/update`,
-        {
-          assetId: asset._id,
-          status: selectedStatus,
-          remarks: remarks || "", // optional
+      // 1️⃣ Prepare data for API
+      const updatedFields = {
+        assetID: id,
+        updatedFields: {
+          name: editForm.name,
+          serialNumber: editForm.serialNumber,
+          model: editForm.model,
+          assetType: editForm.assetType,
+          description: editForm.description, // optional
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      };
 
+      // 2️⃣ API call to new endpoint
+      await axios.put(`${API_BASE_URL}/edit`, updatedFields, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      // 3️⃣ Reset editing state & refresh data
       setEditingId(null);
       setEditForm({});
       await fetchAssets();
-      toast.success("✅ Asset updated successfully");
+      toast.success("✅ Asset details updated successfully");
     } catch (err) {
-      console.error("Update asset error:", err);
-      toast.error("❌ Failed to update asset");
+      console.error("Error updating asset:", err);
+      toast.error("❌ Failed to update asset details");
     } finally {
       setLoading(false);
     }
@@ -363,6 +359,7 @@ export default function MyAssets() {
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-10">
+      {/* Header */}
       <motion.div
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"
         initial={{ opacity: 0, y: -10 }}
@@ -394,8 +391,8 @@ export default function MyAssets() {
         </div>
       </div>
 
-      {/* Assets Table */}
-      <div className="overflow-x-auto rounded-xl shadow-lg bg-white/10 backdrop-blur p-4 border border-white/10">
+      {/* Desktop Table */}
+      <div className="hidden sm:block overflow-x-auto rounded-xl shadow-lg bg-white/10 backdrop-blur p-4 border border-white/10">
         {loading && (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
@@ -407,9 +404,9 @@ export default function MyAssets() {
           <thead>
             <tr className="text-purple-300 border-b border-white/10">
               <th className="py-3 px-4">Name</th>
-              <th className="py-3 px-4 hidden sm:table-cell">Serial No</th>
-              <th className="py-3 px-4 hidden md:table-cell">Model</th>
-              <th className="py-3 px-4 hidden lg:table-cell">Type</th>
+              <th className="py-3 px-4">Serial No</th>
+              <th className="py-3 px-4">Model</th>
+              <th className="py-3 px-4">Type</th>
               <th className="py-3 px-4">Status</th>
               <th className="py-3 px-4">Actions</th>
             </tr>
@@ -446,14 +443,9 @@ export default function MyAssets() {
                   ) : (
                     <div className="font-medium">{asset.name}</div>
                   )}
-
-                  {/* Mobile View */}
-                  <div className="sm:hidden text-xs text-white/60 mt-1">
-                    {asset.serialNumber} • {asset.model} • {asset.assetType}
-                  </div>
                 </td>
 
-                <td className="py-3 px-4 hidden sm:table-cell">
+                <td className="py-3 px-4">
                   {editingId === asset._id ? (
                     <input
                       type="text"
@@ -470,7 +462,8 @@ export default function MyAssets() {
                     asset.serialNumber
                   )}
                 </td>
-                <td className="py-3 px-4 hidden md:table-cell">
+
+                <td className="py-3 px-4">
                   {editingId === asset._id ? (
                     <input
                       type="text"
@@ -484,24 +477,18 @@ export default function MyAssets() {
                     asset.model
                   )}
                 </td>
-                <td className="py-3 px-4 hidden lg:table-cell">
+
+                <td className="py-3 px-4">
                   {editingId === asset._id ? (
                     <select
                       value={editForm.assetType || ""}
                       onChange={(e) =>
-                        setEditForm({
-                          ...editForm,
-                          assetType: e.target.value,
-                        })
+                        setEditForm({ ...editForm, assetType: e.target.value })
                       }
                       className="bg-black/30 text-white px-2 py-1 rounded border border-white/20 focus:ring-1 focus:ring-purple-500 outline-none"
                     >
                       {assetTypes.map((type) => (
-                        <option
-                          key={type}
-                          value={type}
-                          className="bg-gray-800 capitalize"
-                        >
+                        <option key={type} value={type} className="bg-gray-800">
                           {type}
                         </option>
                       ))}
@@ -510,6 +497,7 @@ export default function MyAssets() {
                     <span className="capitalize">{asset.assetType}</span>
                   )}
                 </td>
+
                 <td className="py-3 px-4">
                   {editingId === asset._id ? (
                     <StatusBadge
@@ -523,6 +511,7 @@ export default function MyAssets() {
                     <StatusBadge status={asset.status} assetId={asset._id} />
                   )}
                 </td>
+
                 <td className="py-3 px-4">
                   <div className="flex items-center gap-2">
                     {editingId === asset._id ? (
@@ -531,7 +520,6 @@ export default function MyAssets() {
                           onClick={() => handleSave(asset._id)}
                           disabled={loading}
                           className="text-green-400 hover:text-green-300 transition-all duration-200 transform hover:scale-110 disabled:opacity-50"
-                          title="Save changes"
                         >
                           <FaSave />
                         </button>
@@ -541,7 +529,6 @@ export default function MyAssets() {
                             setEditForm({});
                           }}
                           className="text-gray-400 hover:text-gray-300 transition-all duration-200 transform hover:scale-110"
-                          title="Cancel editing"
                         >
                           <FaTimes />
                         </button>
@@ -551,7 +538,6 @@ export default function MyAssets() {
                         <button
                           onClick={() => handleEdit(asset)}
                           className="text-blue-400 hover:text-blue-300 transition-all duration-200 transform hover:scale-110"
-                          title="Edit asset"
                         >
                           <FaEdit />
                         </button>
@@ -559,7 +545,6 @@ export default function MyAssets() {
                           onClick={() => handleDelete(asset._id)}
                           disabled={loading}
                           className="text-red-400 hover:text-red-300 transition-all duration-200 transform hover:scale-110 disabled:opacity-50"
-                          title="Delete asset"
                         >
                           <FaTrashAlt />
                         </button>
@@ -582,6 +567,164 @@ export default function MyAssets() {
           </div>
         )}
       </div>
+
+      {/* Mobile Card View */}
+      <div className="sm:hidden flex flex-col gap-4">
+        {currentAssets.map((asset, i) => (
+          <motion.div
+            key={asset._id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.38, ease: "easeOut", delay: i * 0.05 }}
+            whileHover={{
+              scale: 1.02,
+              boxShadow: "0 8px 30px rgba(168,85,247,0.12)",
+            }}
+            className="bg-gradient-to-br from-black/30 to-purple-900/10 backdrop-blur-lg border border-white/6 rounded-xl p-4 shadow-md"
+          >
+            {editingId === asset._id ? (
+              <div className="flex flex-col gap-3">
+                <div className="w-full">
+                  <label className="text-xs text-white/60">Name</label>
+                  <input
+                    value={editForm.name || ""}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, name: e.target.value })
+                    }
+                    className="w-full mt-1 bg-black/30 text-white px-3 py-2 rounded-md border border-white/10 focus:ring-1 focus:ring-purple-500 outline-none"
+                  />
+
+                  <div className="mt-3 grid grid-cols-1 gap-2">
+                    <div>
+                      <label className="text-xs text-white/60">Serial No</label>
+                      <input
+                        value={editForm.serialNumber || ""}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            serialNumber: e.target.value,
+                          })
+                        }
+                        className="w-full mt-1 bg-black/30 text-white px-3 py-2 rounded-md border border-white/10 focus:ring-1 focus:ring-purple-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-white/60">Model</label>
+                      <input
+                        value={editForm.model || ""}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, model: e.target.value })
+                        }
+                        className="w-full mt-1 bg-black/30 text-white px-3 py-2 rounded-md border border-white/10 focus:ring-1 focus:ring-purple-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-white/60">Type</label>
+                      <select
+                        value={editForm.assetType || ""}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            assetType: e.target.value,
+                          })
+                        }
+                        className="w-full mt-1 bg-black/30 text-white px-3 py-2 rounded-md border border-white/10 focus:ring-1 focus:ring-purple-500"
+                      >
+                        {assetTypes.map((t) => (
+                          <option key={t} value={t} className="bg-gray-800">
+                            {t.charAt(0).toUpperCase() + t.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-3">
+                  <StatusBadge
+                    status={editForm.status || asset.status}
+                    isEditing={true}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, status: e.target.value })
+                    }
+                  />
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleSave(asset._id)}
+                      disabled={loading}
+                      className="text-green-400 hover:text-green-300"
+                    >
+                      <FaSave />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingId(null);
+                        setEditForm({});
+                      }}
+                      className="text-gray-400 hover:text-gray-300"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-between items-start gap-3">
+                <div>
+                  <h3 className="text-white font-semibold text-base">
+                    {asset.name}
+                  </h3>
+                  <div className="mt-3 text-xs text-white/80 space-y-1.5">
+  <div className="flex flex-col">
+    <span className="text-white/50">Serial No:</span>
+    <span className="font-semibold text-white/90 break-all">{asset.serialNumber || "—"}</span>
+  </div>
+
+  <div className="flex flex-col">
+    <span className="text-white/50">Model:</span>
+    <span className="font-semibold text-white/90 break-all">{asset.model || "—"}</span>
+  </div>
+
+  <div className="flex flex-col">
+    <span className="text-white/50">Type:</span>
+    <span className="capitalize font-semibold text-white/90">{asset.assetType || "—"}</span>
+  </div>
+</div>
+
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <StatusBadge status={asset.status} assetId={asset._id} />
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleEdit(asset)}
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(asset._id)}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      <FaTrashAlt />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        ))}
+
+        {currentAssets.length === 0 && !loading && (
+          <div className="text-center py-12 text-white/70">
+            <div className="text-4xl mb-4">📦</div>
+            <p className="text-lg">No assets found</p>
+            {search && (
+              <p className="text-sm mt-2">Try a different search term</p>
+            )}
+          </div>
+        )}
+      </div>
+
       {showUserModal && selectedUserDetails && (
         <AssignedUserDetailsModal
           isOpen={showUserModal}
@@ -589,7 +732,6 @@ export default function MyAssets() {
           user={selectedUserDetails}
         />
       )}
-
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 mt-8 flex-wrap">
