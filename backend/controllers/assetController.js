@@ -122,6 +122,7 @@ exports.assign = async (req, res) => {
       employeeId: assignedTo.employeeId,
       name: assignedTo.name,
       department: assignedTo.department,
+      email: assignedTo.email ,
     };
     asset.status = assetStatus || "assigned";
     asset.assignedDate = new Date();
@@ -233,7 +234,7 @@ exports.updateAssets = async (req, res) => {
         name: asset.retrievedFrom.name,
         email: asset.retrievedFrom.email,
       };
-      await notifyAssetRetrieval(asset.serialNumber, endUserDetails, process.env.IT_ADMIN_EMAILS.split(','));
+    await notifyAssetRetrieval(asset.serialNumber, endUserDetails, process.env.IT_ADMIN_EMAILS.split(','));
       
     } else if (assetStatus === "to_be_retrieved" && asset.toBeRetrievedFrom) {
       endUserDetails = {
@@ -362,7 +363,6 @@ exports.getDashboardStats = async (req, res) => {
 
 // Bulk upload assets from Excel file
 
-// Assuming you have a History model
 exports.bulkUploadAssets = async (req, res) => {
   try {
     if (!req.file) {
@@ -422,7 +422,7 @@ exports.bulkUploadAssets = async (req, res) => {
       existingDocs.map((d) => String(d.serialNumber))
     );
 
-    // 4) Prepare and insert new assets
+  
     const addedAssets = [];
     const skippedAssets = []; // keep reasons to return better feedback
     const addedSerialsSet = new Set(); // to avoid duplicates inside the file
@@ -452,7 +452,7 @@ exports.bulkUploadAssets = async (req, res) => {
         continue;
       }
 
-      // Save new asset (you can use insertMany for bulk, but saving one-by-one keeps things simple & gives full mongoose docs back)
+      // all good - create
       const newAsset = new Asset(row);
       await newAsset.save();
       addedAssets.push(newAsset);
@@ -533,5 +533,58 @@ exports.bulkUploadAssets = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Error processing bulk upload", error: error.message });
+  }
+};
+exports.updateAssetDetails = async (req, res) => {
+  try {
+    const { assetID, updatedFields } = req.body;
+
+    if (!assetID)
+      return res.status(400).json({ message: "Asset ID is required" });
+    if (!updatedFields || Object.keys(updatedFields).length === 0)
+      return res
+        .status(400)
+        .json({ message: "No fields provided for update" });
+
+    const asset = await Asset.findById(assetID);
+    if (!asset)
+      return res.status(404).json({ message: "Asset not found" });
+
+    
+    const restricted = ["status", "assignedTo", "assignedBy"];
+    for (let field of restricted) {
+      if (updatedFields.hasOwnProperty(field)) delete updatedFields[field];
+    }
+
+    if (updatedFields.serialNumber) {
+      const existingSerial = await Asset.findOne({
+        serialNumber: updatedFields.serialNumber,
+        _id: { $ne: assetID },
+      });
+      if (existingSerial)
+        return res
+          .status(400)
+          .json({ message: "Serial number already exists" });
+    }
+
+    Object.assign(asset, updatedFields);
+
+    
+    const updatedAsset = await asset.save();
+
+    await AssetHistory.create({
+      asset: asset._id,
+      action: "updated_details",
+      details: updatedFields,
+      assignedBy: req.user ? req.user.id : null, 
+    });
+
+    res.status(200).json({
+      message: "Asset details updated successfully",
+      asset: updatedAsset,
+    });
+  } catch (error) {
+    console.error("Error updating asset:", error);
+    res.status(500).json({ message: "Internal server error", error });
   }
 };
