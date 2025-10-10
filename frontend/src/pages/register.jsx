@@ -52,7 +52,7 @@ export default function Register() {
   };
 
   return (
-    <section className="relative min-h-screen  text-white flex flex-col md:flex-row overflow-hidden">
+    <section className="relative min-h-screen  text-white flex flex-col md:flex-row overflow-hidden bg-gradient-to-b from-[#0c0a22] via-[#0e003a] to-[#020005] z-0">
       {/* Left Side - Headline Visual */}
       <div className="md:w-1/2 w-full flex items-center justify-center p-10 relative z-10">
         <motion.div
