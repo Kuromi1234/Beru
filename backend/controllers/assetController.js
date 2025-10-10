@@ -572,13 +572,6 @@ exports.updateAssetDetails = async (req, res) => {
     
     const updatedAsset = await asset.save();
 
-    await AssetHistory.create({
-      asset: asset._id,
-      action: "updated_details",
-      details: updatedFields,
-      assignedBy: req.user ? req.user.id : null, 
-    });
-
     res.status(200).json({
       message: "Asset details updated successfully",
       asset: updatedAsset,
