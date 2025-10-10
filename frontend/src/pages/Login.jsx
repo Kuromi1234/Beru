@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../Context/AuthContext";
+import LiquidEther from "../components/LiquidEther";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -17,7 +18,10 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", formData);
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        formData
+      );
       const { token, user, message } = res.data;
 
       // Save token + user
@@ -43,9 +47,12 @@ const Login = () => {
   };
 
   return (
-    <section className="min-h-screen flex flex-col md:flex-row  text-white">
-      {/* LEFT VISUAL */}
-      <div className="md:w-1/2 w-full flex items-center justify-center p-10 relative overflow-hidden">
+    <section className="min-h-screen flex flex-col md:flex-row  text-white bg-gradient-to-b from-[#0c0a22] via-[#0e003a] to-[#020005] z-0">
+  
+          
+      <div className="md:w-1/2 w-full flex items-center justify-center p-10 relative overflow-hidden z-11">
+        {/* Liquid Ether animation */}
+       
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -71,6 +78,7 @@ const Login = () => {
 
       {/* RIGHT FORM */}
       <div className="md:w-1/2 w-full flex items-center justify-center p-10">
+      
         <motion.form
           onSubmit={handleSubmit}
           initial={{ x: 100, opacity: 0 }}
