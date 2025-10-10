@@ -143,7 +143,6 @@ export default function MyAssets() {
     try {
       setLoading(true);
 
-      // 1️⃣ Prepare data for API
       const updatedFields = {
         assetID: id,
         updatedFields: {
@@ -155,7 +154,7 @@ export default function MyAssets() {
         },
       };
 
-      // 2️⃣ API call to new endpoint
+      
       await axios.put(`${API_BASE_URL}/edit`, updatedFields, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -163,7 +162,7 @@ export default function MyAssets() {
         },
       });
 
-      // 3️⃣ Reset editing state & refresh data
+      
       setEditingId(null);
       setEditForm({});
       await fetchAssets();
@@ -675,22 +674,27 @@ export default function MyAssets() {
                     {asset.name}
                   </h3>
                   <div className="mt-3 text-xs text-white/80 space-y-1.5">
-  <div className="flex flex-col">
-    <span className="text-white/50">Serial No:</span>
-    <span className="font-semibold text-white/90 break-all">{asset.serialNumber || "—"}</span>
-  </div>
+                    <div className="flex flex-col">
+                      <span className="text-white/50">Serial No:</span>
+                      <span className="font-semibold text-white/90 break-all">
+                        {asset.serialNumber || "—"}
+                      </span>
+                    </div>
 
-  <div className="flex flex-col">
-    <span className="text-white/50">Model:</span>
-    <span className="font-semibold text-white/90 break-all">{asset.model || "—"}</span>
-  </div>
+                    <div className="flex flex-col">
+                      <span className="text-white/50">Model:</span>
+                      <span className="font-semibold text-white/90 break-all">
+                        {asset.model || "—"}
+                      </span>
+                    </div>
 
-  <div className="flex flex-col">
-    <span className="text-white/50">Type:</span>
-    <span className="capitalize font-semibold text-white/90">{asset.assetType || "—"}</span>
-  </div>
-</div>
-
+                    <div className="flex flex-col">
+                      <span className="text-white/50">Type:</span>
+                      <span className="capitalize font-semibold text-white/90">
+                        {asset.assetType || "—"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <StatusBadge status={asset.status} assetId={asset._id} />
