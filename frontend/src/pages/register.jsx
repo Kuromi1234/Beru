@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import PasswordField from "../components/PasswordField";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
-    department: "IT", 
+    department: "IT",
   });
 
   const navigate = useNavigate();
@@ -130,18 +131,13 @@ export default function Register() {
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block mb-1 font-medium">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              className="w-full px-4 py-2 rounded-xl bg-black/30 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-purple-400"
-              required
-            />
-          </div>
+          <PasswordField
+            id="password"
+            label="Password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
 
           <div className="mb-6">
             <label className="block mb-1 font-medium">Department</label>
