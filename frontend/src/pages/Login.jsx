@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../Context/AuthContext";
-import LiquidEther from "../components/LiquidEther";
+import PasswordField from "../components/PasswordField";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -48,11 +48,7 @@ const Login = () => {
 
   return (
     <section className="min-h-screen flex flex-col md:flex-row  text-white bg-gradient-to-b from-[#0c0a22] via-[#0e003a] to-[#020005] z-0">
-  
-          
       <div className="md:w-1/2 w-full flex items-center justify-center p-10 relative overflow-hidden z-11">
-        {/* Liquid Ether animation */}
-       
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -78,7 +74,6 @@ const Login = () => {
 
       {/* RIGHT FORM */}
       <div className="md:w-1/2 w-full flex items-center justify-center p-10">
-      
         <motion.form
           onSubmit={handleSubmit}
           initial={{ x: 100, opacity: 0 }}
@@ -104,21 +99,13 @@ const Login = () => {
             />
           </div>
 
-          <div className="mb-6">
-            <label htmlFor="password" className="block mb-1 font-medium">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              required
-              className="w-full px-4 py-2 rounded-xl bg-black/30 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-purple-400"
-            />
-          </div>
+          <PasswordField
+            id="password"
+            label="Password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
 
           <div className="flex justify-end mb-4">
             <Link
