@@ -1,40 +1,50 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link as ScrollLink } from "react-scroll";
+import { Link as RouterLink } from "react-router-dom";
 
-// Section links for in-page scroll
 const navLinks = [
-  { name: "Home", path: "/" },
-  { name: "About", path: "#about" },
-  { name: "Origin", path: "#origin" },
-  { name: "Developer", path: "#developer" },
-  { name: "Contact", path: "#contact" },
+  { name: "Home", target: "hero" },
+  { name: "About", target: "about" },
+  { name: "Origin", target: "origin" },
+  { name: "Developer", target: "developer" },
+  { name: "Contact", target: "contact" },
 ];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-[999] bg-black/30 backdrop-blur-md shadow-md border-b border-white/10 scroll-smooth">
+    <header className="fixed top-0 left-0 w-full z-[999] bg-black/30 backdrop-blur-md shadow-md border-b border-white/10">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Brand */}
-        <a
-          href="#home"
-          className="text-white text-2xl font-extrabold tracking-widest"
+        <ScrollLink
+          to="hero"
+          smooth={true}
+          duration={600}
+          offset={-70}
+          className="text-white text-2xl font-extrabold tracking-widest cursor-pointer"
         >
           BERU
-        </a>
+        </ScrollLink>
 
         {/* Desktop Nav */}
         <ul className="hidden md:flex gap-8 text-white font-medium items-center">
-          {navLinks.map(({ name, path }, i) => (
+          {navLinks.map(({ name, target }, i) => (
             <motion.li
               key={i}
               whileHover={{ scale: 1.08, y: -2, color: "#C084FC" }}
               transition={{ type: "spring", stiffness: 200, damping: 12 }}
               className="cursor-pointer transition-colors duration-300 hover:text-purple-400"
             >
-              <a href={path}>{name}</a>
+              <ScrollLink
+                to={target}
+                smooth={true}
+                duration={600}
+                offset={-70}
+              >
+                {name}
+              </ScrollLink>
             </motion.li>
           ))}
 
@@ -43,12 +53,12 @@ const Navbar = () => {
             whileHover={{ scale: 1.08, y: -2, color: "#C084FC" }}
             transition={{ type: "spring", stiffness: 200, damping: 12 }}
           >
-            <Link
+            <RouterLink
               to="/login"
               className="px-4 py-2 bg-purple-500/20 border border-purple-400 text-white rounded-xl hover:bg-purple-500/40 transition"
             >
               Login
-            </Link>
+            </RouterLink>
           </motion.li>
 
           <p>/</p>
@@ -58,16 +68,16 @@ const Navbar = () => {
             whileHover={{ scale: 1.08, y: -2, color: "#C084FC" }}
             transition={{ type: "spring", stiffness: 200, damping: 12 }}
           >
-            <Link
+            <RouterLink
               to="/register"
               className="px-4 py-2 bg-purple-500/20 border border-purple-400 text-white rounded-xl hover:bg-purple-500/40 transition"
             >
               Signup
-            </Link>
+            </RouterLink>
           </motion.li>
         </ul>
 
-        {/* Hamburger for mobile */}
+        {/* Hamburger */}
         <div
           className="md:hidden z-[999] cursor-pointer flex flex-col gap-1"
           onClick={() => setIsOpen(!isOpen)}
@@ -90,7 +100,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -99,24 +109,34 @@ const Navbar = () => {
             exit={{ opacity: 0, y: -20 }}
             className="md:hidden absolute top-16 left-0 w-full bg-black/90 backdrop-blur-lg px-8 py-6 flex flex-col gap-4"
           >
-            {navLinks.map(({ name, path }, i) => (
-              <a
+            {navLinks.map(({ name, target }, i) => (
+              <ScrollLink
                 key={i}
-                href={path}
+                to={target}
+                smooth={true}
+                duration={600}
+                offset={-70}
                 onClick={() => setIsOpen(false)}
-                className="text-white text-lg font-semibold hover:text-purple-400 transition"
+                className="text-white text-lg font-semibold hover:text-purple-400 transition cursor-pointer"
               >
                 {name}
-              </a>
+              </ScrollLink>
             ))}
 
-            <Link
+            <RouterLink
               to="/login"
               onClick={() => setIsOpen(false)}
               className="text-purple-300 font-semibold border-t border-white/20 pt-4 mt-4"
             >
               Login
-            </Link>
+            </RouterLink>
+            <RouterLink
+              to="/register"
+              onClick={() => setIsOpen(false)}
+              className="text-purple-300 font-semibold border-t border-white/20 pt-4 mt-4"
+            >
+              Register
+            </RouterLink>
           </motion.div>
         )}
       </AnimatePresence>
