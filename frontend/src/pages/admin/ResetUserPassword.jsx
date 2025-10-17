@@ -4,6 +4,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { FaLock, FaArrowLeft } from "react-icons/fa";
+import BASE_URL from "../../utils/apiConfig";
 
 export default function ResetUserPassword() {
   const location = useLocation();
@@ -30,7 +31,7 @@ export default function ResetUserPassword() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `http://localhost:5000/api/admin/adminpsswd/${userId}`,
+        `${BASE_URL}/api/admin/adminpsswd/${userId}`,
         { newPassword },
         {
           headers: {
