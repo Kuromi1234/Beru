@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import Hero from "../section/Hero";
 import About from "../section/About";
 import Origin from "../section/Origin";
