@@ -5,13 +5,15 @@ const jwt = require("jsonwebtoken");
 // Registration
 exports.register = async (req, res) => {
   try {
-    const { employeeId, name, email, password, department } = req.body;
+    let { employeeId, name, email, password, department } = req.body;
+    email = email.toLowerCase();
+
     if (department !== "IT") {
       return res
         .status(403)
         .json({ message: "Only IT department can register, mate!" });
     }
-    email = email.toLowerCase();
+
     const existingUser = await User.findOne({ email });
     if (existingUser)
       return res.status(400).json({ message: "User already exists bro!" });
@@ -29,24 +31,30 @@ exports.register = async (req, res) => {
     });
 
     await newUser.save();
+
     const userobj = newUser.toObject();
-    delete userobj.password, userobj.email, userobj.role;
+    delete userobj.password;
+
     res.status(200).json({
-      message: "User registered successfully , Now Enjoy and login !",
+      message: "User registered successfully, now enjoy and login!",
       user: userobj,
     });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ message: "server side error", error: err.message });
+    return res.status(500).json({
+      message: "Server side error",
+      error: err.message,
+    });
   }
-  console.log("bale bale , register hogaya");
+  console.log("✅ Registration completed successfully");
 };
 
 // Login
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+
+    email = email.toLowerCase();
+
     const foundUser = await User.findOne({ email });
 
     if (!foundUser)
@@ -57,14 +65,20 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid username or password" });
 
     const token = jwt.sign(
-      { id: foundUser._id, role: foundUser.role  , employeeId: foundUser.employeeId, name: foundUser.name  ,department: foundUser.department },
+      {
+        id: foundUser._id,
+        role: foundUser.role,
+        employeeId: foundUser.employeeId,
+        name: foundUser.name,
+        department: foundUser.department,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
     res.status(200).json({
       token,
-      message: "user logged in successfully ",
+      message: "User logged in successfully",
       user: {
         id: foundUser.id,
         name: foundUser.name,
@@ -79,7 +93,7 @@ exports.login = async (req, res) => {
   }
 };
 
-//get all users
+// Get all users
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find({}, "-password");
@@ -92,19 +106,16 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+// Get user profile
 exports.getUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-
     const user = await User.findById(userId).select("-password");
 
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Fixed: Consistent response structure with other endpoints
     res.status(200).json({
       user: {
         id: user._id,
