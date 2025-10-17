@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { Upload, XCircle, CheckCircle, AlertCircle } from "lucide-react";
+import BASE_URL from "../../utils/apiConfig";
 
 export default function BulkUpload() {
   const [file, setFile] = useState(null);
@@ -33,7 +34,7 @@ export default function BulkUpload() {
       formData.append("file", file);
 
       const res = await axios.post(
-        "http://localhost:5000/api/assets/bulk",
+        `${BASE_URL}/api/assets/bulk`,
         formData,
         {
           headers: {
