@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../../utils/apiConfig";
 
 export default function AllUsers() {
   const [users, setUsers] = useState([]);
@@ -20,7 +21,7 @@ export default function AllUsers() {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/auth/users", {
+        const res = await axios.get(`${BASE_URL}/api/auth/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -54,7 +55,7 @@ export default function AllUsers() {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/admin/deleteuser/${id}`, {
+      await axios.delete(`${BASE_URL}/api/admin/deleteuser/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
