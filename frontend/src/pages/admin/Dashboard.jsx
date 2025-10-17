@@ -17,6 +17,7 @@ import {
   Tooltip,
   Legend
 } from "chart.js";
+import BASE_URL from "../../utils/apiConfig";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -41,7 +42,7 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/assets/stats", {
+        const res = await axios.get(`${BASE_URL}/api/assets/stats`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStats(res.data);
