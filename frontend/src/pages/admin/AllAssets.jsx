@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaSearch, FaFileDownload, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
+import BASE_URL from "../../utils/apiConfig";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -19,7 +20,7 @@ export default function AllAssets() {
   const fetchAssets = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/assets/getall", {
+      const res = await axios.get(`${BASE_URL}/api/assets/getall`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAssets(res.data);
@@ -71,7 +72,7 @@ export default function AllAssets() {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/assets/delete/${id}`, {
+      await axios.delete(`${BASE_URL}/api/assets/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("✅ Asset deleted");
