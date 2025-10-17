@@ -4,9 +4,10 @@ import { FaPlusCircle } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { FaChevronDown } from "react-icons/fa";
+import BASE_URL from "../../utils/apiConfig";
 
 
-const API_BASE_URL = "http://localhost:5000/api/assets";
+
 
 const AddAssetPage = () => {
   const [formData, setFormData] = useState({
@@ -38,7 +39,7 @@ const AddAssetPage = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${API_BASE_URL}/add`,
+        `${BASE_URL}/api/assets/add`,
         formData,
         getAuthHeaders()
       );
