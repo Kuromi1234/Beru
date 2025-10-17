@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import PasswordField from "../components/PasswordField";
+import BASE_URL from "../utils/apiConfig";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -32,7 +33,7 @@ export default function Register() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/auth/register", formData);
+      await axios.post(`${BASE_URL}/api/auth/register`, formData);
       toast.success("✅ Registered!", {
         style: { background: "#1f2937", color: "#fff", zIndex: 9999 },
       });
