@@ -21,9 +21,10 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
+import BASE_URL from "../../utils/apiConfig";
 
 const ITEMS_PER_PAGE = 10;
-const API_BASE_URL = "http://localhost:5000/api/assets";
+
 
 export default function MyAssets() {
   const [assets, setAssets] = useState([]);
@@ -84,7 +85,7 @@ export default function MyAssets() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${API_BASE_URL}/getall`,
+        `${BASE_URL}/api/assets/getall`,
         getAuthHeaders()
       );
       setAssets(response.data);
@@ -155,7 +156,7 @@ export default function MyAssets() {
       };
 
       
-      await axios.put(`${API_BASE_URL}/edit`, updatedFields, {
+      await axios.put(`${BASE_URL}/api/assets/edit`, updatedFields, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
@@ -183,7 +184,7 @@ export default function MyAssets() {
 
     try {
       setLoading(true);
-      await axios.delete(`${API_BASE_URL}/delete/${id}`, getAuthHeaders());
+      await axios.delete(`${BASE_URL}/api/assets/delete/${id}`, getAuthHeaders());
       await fetchAssets();
 
       toast.success("✅ Asset deleted successfully");
@@ -216,7 +217,7 @@ export default function MyAssets() {
     ) {
       try {
         await axios.put(
-          `${API_BASE_URL}/update`,
+          `${BASE_URL}/api/assets/update`,
           {
             assetID: id,
             assetStatus: newStatus,
@@ -258,7 +259,7 @@ export default function MyAssets() {
 
       console.log("📦 Payload to assign:", payload);
 
-      await axios.put(`${API_BASE_URL}/assign`, payload, getAuthHeaders());
+      await axios.put(`${BASE_URL}/api/assets/assign`, payload, getAuthHeaders());
 
       await fetchAssets();
       toast.success("✅ Asset assigned successfully");
