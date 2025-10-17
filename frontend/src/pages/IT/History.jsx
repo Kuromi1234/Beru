@@ -4,7 +4,9 @@ import { FaSearch, FaFileDownload } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import BulkUploadPopup from "../../components/BulkUploadPopup";
-const API_BASE_URL = "http://localhost:5000/api/assets/history";
+import BASE_URL from "../../utils/apiConfig";
+
+
 
 export default function HistoryPage() {
   const [history, setHistory] = useState([]);
@@ -34,7 +36,7 @@ export default function HistoryPage() {
       if (fromDate) params.fromDate = fromDate;
       if (toDate) params.toDate = toDate;
 
-      const response = await axios.get(API_BASE_URL, {
+      const response = await axios.get(`${BASE_URL}/api/assets/history`, {
         params,
         ...getAuthHeaders(),
       });
