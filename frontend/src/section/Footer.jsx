@@ -52,16 +52,16 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-3 text-purple-300">Connect</h3>
           <div className="flex gap-4 text-2xl text-slate-300 mb-4">
-            <a href="https://linkedin.com/in/arjunnath99" target="_blank" rel="noreferrer" className="hover:text-purple-400 transition">
+            <a href="https://www.linkedin.com/in/arjun-nath-9b436823a?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BT%2Few8YzpScKXkqAM7lqkXw%3D%3D" target="_blank" rel="noreferrer" className="hover:text-purple-400 transition">
               <FaLinkedin />
             </a>
-            <a href="https://github.com/arjun-nath-dev" target="_blank" rel="noreferrer" className="hover:text-purple-400 transition">
+            <a href="https://github.com/Kuromi1234" target="_blank" rel="noreferrer" className="hover:text-purple-400 transition">
               <FaGithub />
             </a>
-            <a href="mailto:arjun@beru.ai" className="hover:text-purple-400 transition">
+            <a href="mailto:arjunnathhh@gmail.com" className="hover:text-purple-400 transition">
               <FaEnvelope />
             </a>
-            <a href="https://instagram.com/arjun.visual" target="_blank" rel="noreferrer" className="hover:text-purple-400 transition">
+            <a href="https://www.instagram.com/arjunnaaa__thhh?igsh=MW80dWs2ejBmYTNtdw==" target="_blank" rel="noreferrer" className="hover:text-purple-400 transition">
               <FaInstagram />
             </a>
           </div>
