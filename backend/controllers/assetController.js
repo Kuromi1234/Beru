@@ -6,7 +6,10 @@ const path = require("path");
 const multer = require("multer");
 const AssetHistory = require("../models/assetHistory");
 const sendEmail = require("../utils/sendemail");
-const { notifyAssetAssignment, notifyAssetRetrieval } = require("../utils/notificationService");
+const {
+  notifyAssetAssignment,
+  notifyAssetRetrieval,
+} = require("../utils/notificationService");
 
 // Create a new asset
 exports.createAsset = async (req, res) => {
@@ -122,7 +125,7 @@ exports.assign = async (req, res) => {
       employeeId: assignedTo.employeeId,
       name: assignedTo.name,
       department: assignedTo.department,
-      email: assignedTo.email ,
+      email: assignedTo.email,
     };
     asset.status = assetStatus || "assigned";
     asset.assignedDate = new Date();
@@ -147,7 +150,15 @@ exports.assign = async (req, res) => {
 
     await history.save();
     // Notify IT admins about the assignment
-    await notifyAssetAssignment(asset.serialNumber, asset.assignedTo, process.env.IT_ADMIN_EMAILS.split(','));
+    const recipients = process.env.IT_ADMIN_EMAILS
+      ? process.env.IT_ADMIN_EMAILS.split(",")
+      : ["defaultadmin@company.com"]; // fallback
+
+    await notifyAssetAssignment(
+      asset.serialNumber,
+      asset.assignedTo,
+      recipients
+    );
 
     res.status(200).json({
       message: `Asset successfully assigned to ${assignedTo.name} (${assignedTo.employeeId})`,
@@ -234,8 +245,11 @@ exports.updateAssets = async (req, res) => {
         name: asset.retrievedFrom.name,
         email: asset.retrievedFrom.email,
       };
-    await notifyAssetRetrieval(asset.serialNumber, endUserDetails, process.env.IT_ADMIN_EMAILS.split(','));
-      
+      await notifyAssetRetrieval(
+        asset.serialNumber,
+        endUserDetails,
+        process.env.IT_ADMIN_EMAILS.split(",")
+      );
     } else if (assetStatus === "to_be_retrieved" && asset.toBeRetrievedFrom) {
       endUserDetails = {
         employeeId: asset.toBeRetrievedFrom.employeeId,
@@ -254,7 +268,7 @@ exports.updateAssets = async (req, res) => {
     });
 
     // Notify IT admins about retrieval
- 
+
     res.status(200).json({
       message: `Asset status updated to '${assetStatus}'`,
       asset,
@@ -422,7 +436,6 @@ exports.bulkUploadAssets = async (req, res) => {
       existingDocs.map((d) => String(d.serialNumber))
     );
 
-  
     const addedAssets = [];
     const skippedAssets = []; // keep reasons to return better feedback
     const addedSerialsSet = new Set(); // to avoid duplicates inside the file
@@ -499,7 +512,7 @@ exports.bulkUploadAssets = async (req, res) => {
 
     try {
       await sendEmail({
-        to: "arjunnathhh@gmail.com", 
+        to: "arjunnathhh@gmail.com",
         subject: "Bulk Asset Upload Report",
         text: `
       Bulk Upload Report
@@ -542,15 +555,11 @@ exports.updateAssetDetails = async (req, res) => {
     if (!assetID)
       return res.status(400).json({ message: "Asset ID is required" });
     if (!updatedFields || Object.keys(updatedFields).length === 0)
-      return res
-        .status(400)
-        .json({ message: "No fields provided for update" });
+      return res.status(400).json({ message: "No fields provided for update" });
 
     const asset = await Asset.findById(assetID);
-    if (!asset)
-      return res.status(404).json({ message: "Asset not found" });
+    if (!asset) return res.status(404).json({ message: "Asset not found" });
 
-    
     const restricted = ["status", "assignedTo", "assignedBy"];
     for (let field of restricted) {
       if (updatedFields.hasOwnProperty(field)) delete updatedFields[field];
@@ -569,7 +578,6 @@ exports.updateAssetDetails = async (req, res) => {
 
     Object.assign(asset, updatedFields);
 
-    
     const updatedAsset = await asset.save();
 
     res.status(200).json({
