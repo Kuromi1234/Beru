@@ -113,5 +113,5 @@ npm run dev
 ## 🧠 Author
 
 **Arjun Nath**  
-Full-Stack Engineer | AI-Native Developer  
+System Engineer | Learner
 [LinkedIn]([https://www.linkedin.com/in/arjun-nath](https://www.linkedin.com/in/arjun-nath-9b436823a?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BT%2Few8YzpScKXkqAM7lqkXw%3D%3D)) · [GitHub](https://github.com/Kuromi1234)
