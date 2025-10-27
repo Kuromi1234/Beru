@@ -151,14 +151,18 @@ exports.assign = async (req, res) => {
     await history.save();
     // Notify IT admins about the assignment
     const recipients = process.env.IT_ADMIN_EMAILS
-      ? process.env.IT_ADMIN_EMAILS.split(",")
-      : ["defaultadmin@company.com"]; // fallback
+      ? process.env.IT_ADMIN_EMAILS.split(",").filter(Boolean)
+      : ["defaultadmin@company.com"];
 
-    await notifyAssetAssignment(
-      asset.serialNumber,
-      asset.assignedTo,
-      recipients
-    );
+    try {
+      await notifyAssetAssignment(
+        asset.serialNumber,
+        asset.assignedTo,
+        recipients
+      );
+    } catch (notifyErr) {
+      console.error("Notification failed:", notifyErr.message);
+    }
 
     res.status(200).json({
       message: `Asset successfully assigned to ${assignedTo.name} (${assignedTo.employeeId})`,
