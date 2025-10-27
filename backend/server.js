@@ -6,6 +6,7 @@ const assetRoutes = require("./routes/assetRoutes");
 const passwordRoutes = require("./routes/passwordRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const errorHandler = require("./middleware/errorhandler");
+const monitorRoute = require("./routes/monitorroute");
 const cors = require("cors");
 const app = express();
 
@@ -19,6 +20,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/passwd",passwordRoutes);
 app.use("/api/admin",adminRoutes);
+app.use("/", monitorRoute);
+
 
 //err handler
 app.use((req, res, next) => {
@@ -32,10 +35,6 @@ app.use((req, res, next) => {
 // Global error handler
 app.use(errorHandler);
 
-//for monitoring 
-app.get("/", (req, res) => {
-  res.send("✅ Beru backend is running fine!");
-});
 
 
 
