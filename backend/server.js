@@ -27,8 +27,16 @@ app.use((req, res, next) => {
   next(error);
 });
 
+
+
 // Global error handler
 app.use(errorHandler);
+
+//for monitoring 
+app.get("/", (req, res) => {
+  res.send("✅ Beru backend is running fine!");
+});
+
 
 
 
