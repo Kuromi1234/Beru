@@ -1,7 +1,7 @@
 // src/utils/api.js
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api"; // or your server
+const BASE_URL = "http://localhost:5000/api"; 
 
 export const requestPasswordReset = (email) =>
   axios.post(`${BASE_URL}/passwd/request-reset`, { email });
