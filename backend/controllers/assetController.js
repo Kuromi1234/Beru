@@ -94,11 +94,11 @@ exports.getAssetById = async (req, res) => {
       .json({ message: "Error fetching asset", error: err.message });
   }
 };
-
 exports.assign = async (req, res) => {
   try {
     const { assetID, assetStatus, assignedTo } = req.body;
 
+    //  Validate required fields
     if (
       !assetID ||
       !assignedTo?.employeeId ||
@@ -111,11 +111,13 @@ exports.assign = async (req, res) => {
       });
     }
 
+    // Find asset
     const asset = await Asset.findById(assetID);
     if (!asset) {
       return res.status(404).json({ message: "Asset not found" });
     }
 
+    //  Prevent double assignment
     if (asset.status === "assigned") {
       return res.status(400).json({ message: "Asset is already assigned" });
     }
@@ -135,7 +137,7 @@ exports.assign = async (req, res) => {
 
     await asset.save();
 
-    // Create AssetHistory entry
+    //Create history record
     const history = new AssetHistory({
       asset: asset._id,
       endUser: {
@@ -149,34 +151,36 @@ exports.assign = async (req, res) => {
     });
 
     await history.save();
-    // Notify IT admins about the assignment
+
+    // Notify IT admins
     const recipients = process.env.IT_ADMIN_EMAILS
       ? process.env.IT_ADMIN_EMAILS.split(",").filter(Boolean)
       : ["defaultadmin@company.com"];
 
-    try {
-      await notifyAssetAssignment(
-        asset.serialNumber,
-        asset.assignedTo,
-        recipients
-      );
-    } catch (notifyErr) {
+    notifyAssetAssignment(
+      asset.serialNumber,
+      asset.assignedTo,
+      recipients
+    ).catch((notifyErr) => {
       console.error("Notification failed:", notifyErr.message);
-    }
+    });
 
-    res.status(200).json({
+    // ✅ Send API response IMMEDIATELY
+    return res.status(200).json({
       message: `Asset successfully assigned to ${assignedTo.name} (${assignedTo.employeeId})`,
       asset,
       history,
     });
+
   } catch (err) {
     console.error("Error assigning asset:", err);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Error assigning asset",
       error: err.message,
     });
   }
 };
+
 // Update asset lifecycle status (unified endpoint)
 exports.updateAssets = async (req, res) => {
   try {
