@@ -253,7 +253,7 @@ exports.updateAssets = async (req, res) => {
         name: asset.retrievedFrom.name,
         email: asset.retrievedFrom.email,
       };
-      await notifyAssetRetrieval(
+        notifyAssetRetrieval(
         asset.serialNumber,
         endUserDetails,
         process.env.IT_ADMIN_EMAILS.split(",")
