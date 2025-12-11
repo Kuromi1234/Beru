@@ -257,9 +257,7 @@ export default function MyAssets() {
         },
       };
 
-      console.log("📦 Payload to assign:", payload);
-
-      await axios.put(`${BASE_URL}/api/assets/assign`,  getAuthHeaders());
+      await axios.put(`${BASE_URL}/api/assets/assign`, payload , getAuthHeaders());
 
       await fetchAssets();
       toast.success("✅ Asset assigned successfully");
