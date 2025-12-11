@@ -256,6 +256,13 @@ exports.updateAssets = async (req, res) => {
         name: asset.retrievedFrom.name,
         email: asset.retrievedFrom.email,
       };
+      console.log("EMAIL_USER:", process.env.EMAIL_USER);
+      console.log(
+        "EMAIL_PASS:",
+        process.env.EMAIL_PASS ? "Loaded" : "NOT LOADED"
+      );
+      console.log("IT_ADMIN_EMAILS:", process.env.IT_ADMIN_EMAILS);
+
       notifyAssetRetrieval(
         asset.serialNumber,
         endUserDetails,
