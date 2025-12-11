@@ -153,10 +153,14 @@ exports.assign = async (req, res) => {
     await history.save();
 
     // Notify IT admins
-    const recipients = process.env.IT_ADMIN_EMAILS
-      ? process.env.IT_ADMIN_EMAILS.split(",").filter(Boolean)
-      : ["defaultadmin@company.com"];
+    if (!process.env.IT_ADMIN_EMAILS) {
+      console.error("❌ IT_ADMIN_EMAILS environment variable is missing!");
+    }
 
+    const recipients = (process.env.IT_ADMIN_EMAILS || "")
+      .split(",")
+      .map((e) => e.trim())
+      .filter(Boolean);
     notifyAssetAssignment(
       asset.serialNumber,
       asset.assignedTo,
@@ -171,7 +175,6 @@ exports.assign = async (req, res) => {
       asset,
       history,
     });
-
   } catch (err) {
     console.error("Error assigning asset:", err);
     return res.status(500).json({
@@ -253,7 +256,7 @@ exports.updateAssets = async (req, res) => {
         name: asset.retrievedFrom.name,
         email: asset.retrievedFrom.email,
       };
-        notifyAssetRetrieval(
+      notifyAssetRetrieval(
         asset.serialNumber,
         endUserDetails,
         process.env.IT_ADMIN_EMAILS.split(",")
