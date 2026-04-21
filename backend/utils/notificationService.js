@@ -2,12 +2,14 @@ const sendEmail = require("./sendemail");
 
 const notifyAssetAssignment = async (assetID, assignedTo, adminEmails) => {
   const subject = "New Asset Assignment Notification";
-  const text = `Asset ${assetID} has been assigned to:
-    Name: ${assignedTo.name}
-    Employee ID: ${assignedTo.employeeId}
-    Email: ${assignedTo.email}
-    Date: ${new Date().toDateString()}`;
+  const text = `
+        Asset ${assetID} has been assigned to:
 
+        Name: ${assignedTo.name}
+        Employee ID: ${assignedTo.employeeId}
+        Email: ${assignedTo.email || "N/A"}
+        Date: ${new Date().toDateString()}
+        `;
   console.log("📨 Sending assignment emails to:", adminEmails);
 
   const results = await Promise.allSettled(
