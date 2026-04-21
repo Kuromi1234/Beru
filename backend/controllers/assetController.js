@@ -71,7 +71,7 @@ exports.getAllAssets = async (req, res) => {
   try {
     const assets = await Asset.find().populate(
       "assignedTo",
-      "name empid email"
+      "name empid email",
     );
     res.status(200).json(assets);
   } catch (err) {
@@ -84,7 +84,7 @@ exports.getAssetById = async (req, res) => {
   try {
     const asset = await Asset.findById(req.params.id).populate(
       "assignedTo",
-      "name empid email"
+      "name empid email",
     );
     if (!asset) return res.status(404).json({ message: "Asset not found" });
     res.status(200).json(asset);
@@ -103,7 +103,8 @@ exports.assign = async (req, res) => {
       !assetID ||
       !assignedTo?.employeeId ||
       !assignedTo?.name ||
-      !assignedTo?.department
+      !assignedTo?.department ||
+      !assignedTo?.email
     ) {
       return res.status(400).json({
         message:
@@ -164,7 +165,7 @@ exports.assign = async (req, res) => {
     notifyAssetAssignment(
       asset.serialNumber,
       asset.assignedTo,
-      recipients
+      recipients,
     ).catch((notifyErr) => {
       console.error("Notification failed:", notifyErr.message);
     });
@@ -259,15 +260,21 @@ exports.updateAssets = async (req, res) => {
       console.log("EMAIL_USER:", process.env.EMAIL_USER);
       console.log(
         "EMAIL_PASS:",
-        process.env.EMAIL_PASS ? "Loaded" : "NOT LOADED"
+        process.env.EMAIL_PASS ? "Loaded" : "NOT LOADED",
       );
       console.log("IT_ADMIN_EMAILS:", process.env.IT_ADMIN_EMAILS);
+      const recipients = (process.env.IT_ADMIN_EMAILS || "")
+        .split(",")
+        .map((e) => e.trim())
+        .filter(Boolean);
 
       notifyAssetRetrieval(
         asset.serialNumber,
         endUserDetails,
-        process.env.IT_ADMIN_EMAILS.split(",")
-      );
+        recipients,
+      ).catch((err) => {
+        console.error("❌ Retrieval email failed:", err);
+      });
     } else if (assetStatus === "to_be_retrieved" && asset.toBeRetrievedFrom) {
       endUserDetails = {
         employeeId: asset.toBeRetrievedFrom.employeeId,
@@ -451,7 +458,7 @@ exports.bulkUploadAssets = async (req, res) => {
           .lean()
       : [];
     const existingSerialSet = new Set(
-      existingDocs.map((d) => String(d.serialNumber))
+      existingDocs.map((d) => String(d.serialNumber)),
     );
 
     const addedAssets = [];
