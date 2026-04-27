@@ -157,7 +157,7 @@ export default function BulkUpload() {
           <li>✅ File format: CSV / XLSX</li>
           <li>✅ Max size: 5MB</li>
           <li>✅ First row must contain column headers</li>
-          <li>✅ Columns: Asset Name, Type, Status, AssignedTo</li>
+          <li>✅ Columns: Name ,Serial No , Model ,Type, Status</li>
           <li>⚠️ Invalid rows will be skipped</li>
         </ul>
       </motion.div>
