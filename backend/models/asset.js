@@ -19,7 +19,7 @@ const assetSchema = new mongoose.Schema(
     },
     assetType: {
       type: String,
-      enum: ["Laptop", "Monitor", "Keyboard", "Mouse", "desktop", "Other","laptop", "monitor", "keyboard", "mouse", "desktop", "other"],
+      enum: ["Laptop", "Monitor", "Keyboard", "Mouse", "desktop", "Other","laptop", "monitor", "keyboard", "mouse", "desktop", "other","headset","Headset"],
       required: true,
     },
     status: {
