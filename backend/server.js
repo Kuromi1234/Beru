@@ -13,9 +13,9 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-
-//routes
 app.use(cors());
+//routes
+
 app.use("/api/auth", authRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/passwd",passwordRoutes);
